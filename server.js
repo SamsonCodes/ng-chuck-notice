@@ -22,7 +22,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(cors({origin: 'http://localhost:4200'}));
 
-const userApi = require('./routes/user-api.js');
+const userApi = require('./server/routes/user-api.js');
 app.use('/api/users', userApi);
 
 app.get('/', (req, res) => {
