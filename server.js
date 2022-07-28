@@ -3,6 +3,10 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 
+const userApi = require('./server/routes/user-api.js');
+const taskApi = require('./server/routes/task-api.js');
+const assignmentApi = require('./server/routes/assignment-api.js');
+
 const app = express();
 const port = 3000;
 
@@ -22,11 +26,9 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(cors({origin: 'http://localhost:4200'}));
 
-const userApi = require('./server/routes/user-api.js');
 app.use('/api/users', userApi);
-
-const taskApi = require('./server/routes/task-api.js');
 app.use('/api/tasks', taskApi);
+app.use('/api/assignments', assignmentApi);
 
 app.get('/', (req, res) => {
   res.send('Hello World!')

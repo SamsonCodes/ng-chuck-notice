@@ -5,7 +5,8 @@ const taskSchema = new mongoose.Schema({
     description: String,
     deadline: String,
     status: String,
-    created_by: String
+    created_by: String,
+    created_on: String
 });
 
 module.exports = mongoose.model('Task', taskSchema);
