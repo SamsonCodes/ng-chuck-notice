@@ -25,6 +25,9 @@ app.use(cors({origin: 'http://localhost:4200'}));
 const userApi = require('./server/routes/user-api.js');
 app.use('/api/users', userApi);
 
+const taskApi = require('./server/routes/task-api.js');
+app.use('/api/tasks', taskApi);
+
 app.get('/', (req, res) => {
   res.send('Hello World!')
 });
