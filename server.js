@@ -6,6 +6,7 @@ const cors = require('cors');
 const userApi = require('./server/routes/user-api.js');
 const taskApi = require('./server/routes/task-api.js');
 const assignmentApi = require('./server/routes/assignment-api.js');
+const dependencyApi = require('./server/routes/dependency-api.js');
 
 const app = express();
 const port = 3000;
@@ -29,6 +30,7 @@ app.use(cors({origin: 'http://localhost:4200'}));
 app.use('/api/users', userApi);
 app.use('/api/tasks', taskApi);
 app.use('/api/assignments', assignmentApi);
+app.use('/api/dependencies', dependencyApi);
 
 app.get('/', (req, res) => {
   res.send('Hello World!')
