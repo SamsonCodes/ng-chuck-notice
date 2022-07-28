@@ -6,7 +6,8 @@ module.exports.addOne = function(req, res){
         {
             name: req.body.name,
             password: req.body.password,
-            userGroup: req.body.userGroup
+            userGroup: req.body.userGroup,
+            penalties: req.body.penalties
         }
     );
     newUser.save((err, doc) => {
