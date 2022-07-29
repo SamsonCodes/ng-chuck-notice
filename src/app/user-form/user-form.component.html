@@ -1,16 +1,20 @@
 <h1>Add User</h1>
-<form [formGroup]="userForm" (ngSubmit)="onSubmit()">
+<form [formGroup]="userForm" (ngSubmit)="onSubmit()" (change)="logger()">
     <div class="form-group">
         <label for="nameInput">Name</label>
-        <input type="text" id="nameInput" formControlName="name" class="form-control" required autofocus>
-    </div>
-    <div class="form-group">
-        <label for="passwordInput">Password</label>
-        <input type="password" id="passwordInput" formControlName="password" class="form-control" required>  
+        <input 
+            required autofocus
+            type="text" class="form-control"
+            id="nameInput" formControlName="name" 
+        >
     </div>
     <div class="form-group">
         <label for="groupInput">User Group</label>
-        <input type="text" id="groupInput" formControlName="userGroup" class="form-control" required>  
+        <input 
+            required
+            type="text" class="form-control"
+            id="groupInput" formControlName="userGroup"
+        >  
     </div>
     <button class="btn btn-lg btn-primary btn-block" type="submit">Add User</button>        
 </form>
@@ -20,11 +24,20 @@
         <th>Name</th>
         <th>UserGroup</th>
         <th>Penalties</th>
+        <th></th>
       </tr>
     </thead>
     <tr *ngFor="let user of users">
       <td>{{user.name}}</td>
       <td>{{user.userGroup}}</td>
       <td>{{user.penalties}}</td>
+      <td>
+        <a href="#">
+            <i class="material-icons">edit</i>
+        </a>
+        <a href="#">
+            <i class="material-icons">delete</i>
+        </a>
+      </td>
     </tr>
-  </table>
+</table>

@@ -16,7 +16,7 @@ export class UserFormComponent {
   userForm = this.formBuilder.group({
     _id: '',
     name: '',
-    password: '',
+    password: '1234',
     userGroup: '',
     penalties: 0
   });
@@ -32,7 +32,6 @@ export class UserFormComponent {
   onSubmit(){
     console.log(this.userForm.value); 
     this.userService.postUser(this.userForm.value).subscribe((res) => {
-      this.userForm.reset(); 
       this.refreshUserList();
     });
       
@@ -42,5 +41,9 @@ export class UserFormComponent {
     this.userService.getUsers().subscribe((res) => {
       this.users = res as User[];
     })
+  }
+
+  logger(){
+    console.log(this.userForm.value);    
   }
 }
