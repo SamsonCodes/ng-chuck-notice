@@ -18,4 +18,8 @@ export class UserService {
   getUsers(){
     return this.http.get(this.usersUrl);
   }
+
+  deleteUser(userId: string){
+    return this.http.delete(this.usersUrl + `/${userId}`);
+  }
 }

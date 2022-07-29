@@ -21,9 +21,10 @@ export class UserFormComponent {
     penalties: 0
   });
   
-  constructor(private userService: UserService, private formBuilder: FormBuilder) { 
-    
-  }
+  constructor(
+    private userService: UserService, 
+    private formBuilder: FormBuilder
+  ) {}
 
   ngOnInit(): void {
     this.refreshUserList();
@@ -33,14 +34,19 @@ export class UserFormComponent {
     console.log(this.userForm.value); 
     this.userService.postUser(this.userForm.value).subscribe((res) => {
       this.refreshUserList();
+    });      
+  }
+
+  onDelete(userId: string){
+    this.userService.deleteUser(userId).subscribe((res) => {
+      this.refreshUserList();
     });
-      
   }
 
   refreshUserList(){
     this.userService.getUsers().subscribe((res) => {
       this.users = res as User[];
-    })
+    });
   }
 
   logger(){
