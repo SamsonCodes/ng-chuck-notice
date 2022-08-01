@@ -7,6 +7,7 @@
             minlength="3"
             type="text" class="form-control"
             id="titleInput" formControlName="title" 
+            [(ngModel)]="this.task.title"
         >
     </div>
     <div class="form-group">
@@ -16,6 +17,7 @@
             minlength="3"
             type="text" class="form-control"
             id="descriptionInput" formControlName="description" 
+            [(ngModel)]="this.task.description"
         >
     </div>
     <div class="form-group">
@@ -23,6 +25,7 @@
         <input 
             type="date" id="deadlineInput" formControlName="deadline"
             min="2022-08-01" max="2052-12-31"
+            [(ngModel)]="this.task.deadline"
         >
     </div>
     <!-- <div class="form-group">

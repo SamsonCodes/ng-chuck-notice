@@ -18,12 +18,19 @@ export class TasksComponent implements OnInit {
   defaultValues = {
     title: 'Title',
     description: 'Description',
+    deadline: ''
+  }
+
+  taskForm = this.formBuilder.group(this.defaultValues);
+
+  task = {
+    title: 'Title',
+    description: 'Description',
     deadline: '',
     status: 'Open',    
     created_by: '62e3e215e4c239fe3041682c',
     created_on: ''
-  }
-  taskForm = this.formBuilder.group(this.defaultValues);
+  } as Task;
   
   constructor(
     private taskService: TaskService, 
@@ -34,15 +41,19 @@ export class TasksComponent implements OnInit {
     this.refreshTaskList();
   }
 
-  onSubmit(){    
-    var today = new Date();
-    var todayString = convertToDateString(today);
-    this.taskForm.value.created_on = todayString;
-    console.log(this.taskForm.value); 
-    this.taskService.postTask(this.taskForm.value).subscribe((res) => {
+  onSubmit(){        
+    this.task.created_on = this.getCreatedOn();
+    console.log(this.task); 
+    this.taskService.postTask(this.task).subscribe((res) => {
       this.refreshTaskList();
       this.resetForm();
     });      
+  }
+
+  getCreatedOn(){
+    var today = new Date();
+    var todayString = convertToDateString(today);
+    return todayString
   }
 
   resetForm(){
