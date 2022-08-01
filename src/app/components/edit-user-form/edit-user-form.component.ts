@@ -1,8 +1,8 @@
 import { Component, OnChanges, Input, SimpleChanges } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 
-import { UserService } from '../user.service';
-import { User } from '../user';
+import { UserService } from '../../user.service';
+import { User } from '../../user';
 
 @Component({
   selector: 'edit-user-form',
