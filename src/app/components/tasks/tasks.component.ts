@@ -14,8 +14,6 @@ import { convertToDateString } from '../../dateHelper';
 })
 export class TasksComponent implements OnInit {
   tasks: Task[] = [];
-  selectedTask?: Task;
-
 
   defaultValues = {
     title: 'Title',
@@ -49,10 +47,6 @@ export class TasksComponent implements OnInit {
 
   resetForm(){
     this.taskForm.setValue(this.defaultValues);
-  }
-
-  onEdit(task: Task){
-    this.selectedTask = task;
   }
 
   onDelete(taskId: string){
