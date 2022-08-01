@@ -19,6 +19,10 @@ export class UserService {
     return this.http.get(this.usersUrl);
   }
 
+  putUser(user: User){
+    return this.http.put(this.usersUrl + `/${user._id}`, user);
+  }
+
   deleteUser(userId: string){
     return this.http.delete(this.usersUrl + `/${userId}`);
   }

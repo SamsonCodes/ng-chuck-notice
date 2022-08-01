@@ -12,6 +12,7 @@ import { User } from '../user';
 })
 export class UserFormComponent {
   users: User[] = [];
+  selectedUser?: User;
 
   userForm = this.formBuilder.group({
     _id: '',
@@ -48,11 +49,17 @@ export class UserFormComponent {
     });
   }
 
+  onEdit(user: User){
+    this.selectedUser = user;
+  }
+
   onDelete(userId: string){
     this.userService.deleteUser(userId).subscribe((res) => {
       this.refreshUserList();
     });
   }
+
+  
 
   refreshUserList(){
     this.userService.getUsers().subscribe((res) => {

@@ -37,7 +37,7 @@
       <td>{{user.userGroup}}</td>
       <td>{{user.penalties}}</td>
       <td>
-        <a href="#">
+        <a (click)="onEdit(user)">
             <i class="material-icons">edit</i>
         </a>
         <a (click)="onDelete(user._id)">
@@ -46,3 +46,4 @@
       </td>
     </tr>
 </table>
+<edit-user-form *ngIf="selectedUser" [selectedUser]="this.selectedUser"></edit-user-form>
