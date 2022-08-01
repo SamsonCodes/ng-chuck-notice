@@ -5,12 +5,12 @@ import { UserService } from '../../user.service';
 import { User } from '../../user';
 
 @Component({
-  selector: 'user-form',
-  templateUrl: './user-form.component.html',
-  styleUrls: ['./user-form.component.css'],
+  selector: 'users',
+  templateUrl: './users.component.html',
+  styleUrls: ['./users.component.css'],
   providers: [UserService]
 })
-export class UserFormComponent implements OnInit {
+export class UsersComponent implements OnInit {
   users: User[] = [];
   selectedUser?: User;
 

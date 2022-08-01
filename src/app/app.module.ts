@@ -5,7 +5,7 @@ import { HttpClientModule } from '@angular/common/http';
 
 import { AppComponent } from './app.component';
 import { HeaderComponent } from './components/header/header.component';
-import { UserFormComponent } from './components/user-form/user-form.component';
+import { UsersComponent } from './components/users/users.component';
 import { EditUserFormComponent } from './components/edit-user-form/edit-user-form.component';
 import { AppRoutingModule } from './app-routing.module';
 import { TasksComponent } from './components/tasks/tasks.component';
@@ -15,7 +15,7 @@ import { TasksComponent } from './components/tasks/tasks.component';
   declarations: [
     AppComponent,
     HeaderComponent,
-    UserFormComponent,
+    UsersComponent,
     EditUserFormComponent,
     TasksComponent
   ],
