@@ -1,0 +1,64 @@
+<h1>Add Task</h1>
+<form [formGroup]="taskForm" (ngSubmit)="onSubmit()" (change)="logger()">
+    <div class="form-group">
+        <label for="titleInput">Title</label>
+        <input 
+            required autofocus
+            minlength="3"
+            type="text" class="form-control"
+            id="titleInput" formControlName="title" 
+        >
+    </div>
+    <div class="form-group">
+        <label for="descriptionInput">Description</label>
+        <input 
+            required
+            minlength="3"
+            type="text" class="form-control"
+            id="descriptionInput" formControlName="description" 
+        >
+    </div>
+    <div class="form-group">
+        <label for="deadlineInput">Deadline</label>
+        <input 
+            type="date" id="deadlineInput" formControlName="deadline"
+            min="2022-08-01" max="2052-12-31"
+        >
+    </div>
+    <!-- <div class="form-group">
+        <label for="deadlineInput">Deadline</label>
+        <input 
+            required
+            minlength="3"
+            type="text" class="form-control"
+            id="deadlineInput" formControlName="deadline"
+        >
+    </div> -->
+    <button *ngIf="taskForm.valid" class="btn btn-lg btn-primary btn-block" type="submit">Add Task</button>        
+</form>
+<table class=>
+    <thead>
+      <tr>
+        <th>Title</th>
+        <th>Description</th>
+        <th>Deadline</th>
+        <th>Status</th>
+        <th>Created By</th>
+        <th>Created On</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tr *ngFor="let task of tasks">
+      <td>{{task.title}}</td>
+      <td>{{task.description}}</td>
+      <td>{{task.deadline}}</td>
+      <td>{{task.status}}</td>
+      <td>{{task.created_by}}</td>
+      <td>{{task.created_on}}</td>
+      <td>        
+        <a (click)="onDelete(task._id)">
+            <i class="material-icons">delete</i>
+        </a>
+      </td>
+    </tr>
+</table>

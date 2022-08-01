@@ -5,7 +5,7 @@ export class Task {
         public description: string,
         public deadline: string,
         public status: string,
-        public create_by: string,
+        public created_by: string,
         public created_on: string
     ){}
 }
