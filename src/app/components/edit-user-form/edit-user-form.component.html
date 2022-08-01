@@ -19,13 +19,15 @@
           <option value="admins">Admin</option>
           <option value="managers">Manager</option>
           <option value="employees">Employee</option>
+          <option value="rh-kicked">Roundhouse Kicked</option>
         </select>
     </div>
     <div class="form-group">
         <label for="penaltiesInput">Penalties</label>
         <input 
             required
-            type="text" class="form-control"
+            type="number" class="form-control"
+            min="0"
             id="penaltiesInput" formControlName="penalties" 
         >
     </div>
