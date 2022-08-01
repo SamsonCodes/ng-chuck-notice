@@ -19,6 +19,10 @@ export class UserService {
     return this.http.get(this.usersUrl);
   }
 
+  getUser(userId: string){
+    return this.http.get(this.usersUrl + `/${userId}`);
+  }
+
   putUser(user: User){
     return this.http.put(this.usersUrl + `/${user._id}`, user);
   }

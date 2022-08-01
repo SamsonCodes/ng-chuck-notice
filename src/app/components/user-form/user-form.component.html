@@ -37,7 +37,7 @@
       <td>{{user.userGroup}}</td>
       <td>{{user.penalties}}</td>
       <td>
-        <a (click)="onEdit(user)">
+        <a routerLink="/edit-user/{{user._id}}">
             <i class="material-icons">edit</i>
         </a>
         <a (click)="onDelete(user._id)">
