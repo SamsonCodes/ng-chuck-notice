@@ -3,7 +3,7 @@ import { FormBuilder } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { Location } from '@angular/common';
 
-import { UserService } from '../../user.service';
+import { UserService } from '../../services/user.service';
 import { User } from '../../user';
 
 @Component({

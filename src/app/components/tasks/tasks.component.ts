@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 
-import { TaskService } from '../../task.service';
+import { TaskService } from '../../services/task.service';
 import { Task } from '../../task';
 
 import { convertToDateString } from '../../dateHelper';
