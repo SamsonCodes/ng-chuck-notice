@@ -1,4 +1,4 @@
-<h1>Add User</h1>
+<h1>Edit User</h1>
 <form [formGroup]="userForm" (ngSubmit)="onSubmit()" (change)="logger()">
     <div class="form-group">
         <label for="nameInput">Name</label>
@@ -23,26 +23,3 @@
     </div>
     <button *ngIf="userForm.valid" class="btn btn-lg btn-primary btn-block" type="submit">Add User</button>        
 </form>
-<table class=>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>UserGroup</th>
-        <th>Penalties</th>
-        <th></th>
-      </tr>
-    </thead>
-    <tr *ngFor="let user of users">
-      <td>{{user.name}}</td>
-      <td>{{user.userGroup}}</td>
-      <td>{{user.penalties}}</td>
-      <td>
-        <a href="#">
-            <i class="material-icons">edit</i>
-        </a>
-        <a (click)="onDelete(user._id)">
-            <i class="material-icons">delete</i>
-        </a>
-      </td>
-    </tr>
-</table>

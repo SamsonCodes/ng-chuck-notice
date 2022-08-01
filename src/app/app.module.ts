@@ -6,13 +6,15 @@ import { HttpClientModule } from '@angular/common/http';
 import { AppComponent } from './app.component';
 import { HeaderComponent } from './components/header/header.component';
 import { UserFormComponent } from './user-form/user-form.component';
+import { EditUserFormComponent } from './edit-user-form/edit-user-form.component';
 
 
 @NgModule({
   declarations: [
     AppComponent,
     HeaderComponent,
-    UserFormComponent
+    UserFormComponent,
+    EditUserFormComponent
   ],
   imports: [
     BrowserModule,

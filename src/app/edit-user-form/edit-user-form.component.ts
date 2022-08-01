@@ -1,17 +1,18 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 
 import { UserService } from '../user.service';
 import { User } from '../user';
 
 @Component({
-  selector: 'user-form',
-  templateUrl: './user-form.component.html',
-  styleUrls: ['./user-form.component.css'],
+  selector: 'app-edit-user-form',
+  templateUrl: './edit-user-form.component.html',
+  styleUrls: ['./edit-user-form.component.css'],
   providers: [UserService]
 })
-export class UserFormComponent {
+export class EditUserFormComponent {
   users: User[] = [];
+  @Input() selectedUser?: User;
 
   userForm = this.formBuilder.group({
     _id: '',
