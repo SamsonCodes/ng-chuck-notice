@@ -1,4 +1,4 @@
-import { Component, OnChanges, Input, SimpleChanges } from '@angular/core';
+import { Component, OnChanges, Input, SimpleChanges, OnInit } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 
 import { UserService } from '../../user.service';
@@ -10,7 +10,7 @@ import { User } from '../../user';
   styleUrls: ['./edit-user-form.component.css'],
   providers: [UserService]
 })
-export class EditUserFormComponent {
+export class EditUserFormComponent implements OnInit {
   @Input() selectedUser = {
     _id: '',
     name: '',

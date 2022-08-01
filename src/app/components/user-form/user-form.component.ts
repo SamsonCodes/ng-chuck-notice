@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 
 import { UserService } from '../../user.service';
@@ -10,7 +10,7 @@ import { User } from '../../user';
   styleUrls: ['./user-form.component.css'],
   providers: [UserService]
 })
-export class UserFormComponent {
+export class UserFormComponent implements OnInit {
   users: User[] = [];
   selectedUser?: User;
 
