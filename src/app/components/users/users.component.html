@@ -1,5 +1,5 @@
 <h1>Add User</h1>
-<form [formGroup]="userForm" (ngSubmit)="onSubmit()" (change)="logger()">
+<form [formGroup]="userForm" (ngSubmit)="onSubmit()">
     <div class="form-group">
         <label for="nameInput">Name</label>
         <input 
@@ -47,4 +47,3 @@
       </td>
     </tr>
 </table>
-<edit-user-form *ngIf="selectedUser" [selectedUser]="this.selectedUser"></edit-user-form>

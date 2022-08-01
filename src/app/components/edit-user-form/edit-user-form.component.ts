@@ -70,8 +70,4 @@ export class EditUserFormComponent implements OnInit {
   goBack(): void {
     this.location.back();
   }
-
-  logger(){
-    console.log(this.userForm.value);    
-  }
 }

@@ -12,7 +12,6 @@ import { User } from '../../user';
 })
 export class UsersComponent implements OnInit {
   users: User[] = [];
-  selectedUser?: User;
 
   userForm = this.formBuilder.group({
     _id: '',
@@ -32,7 +31,6 @@ export class UsersComponent implements OnInit {
   }
 
   onSubmit(){
-    console.log(this.userForm.value); 
     this.userService.postUser(this.userForm.value).subscribe((res) => {
       this.refreshUserList();
       this.resetForm();
@@ -49,17 +47,11 @@ export class UsersComponent implements OnInit {
     });
   }
 
-  onEdit(user: User){
-    this.selectedUser = user;
-  }
-
   onDelete(userId: string){
     this.userService.deleteUser(userId).subscribe((res) => {
       this.refreshUserList();
     });
   }
-
-  
 
   refreshUserList(){
     this.userService.getUsers().subscribe((res) => {
