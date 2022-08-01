@@ -4,6 +4,8 @@ import { FormBuilder } from '@angular/forms';
 import { TaskService } from '../../task.service';
 import { Task } from '../../task';
 
+import { convertToDateString } from '../../dateHelper';
+
 @Component({
   selector: 'tasks',
   templateUrl: './tasks.component.html',
@@ -34,7 +36,10 @@ export class TasksComponent implements OnInit {
     this.refreshTaskList();
   }
 
-  onSubmit(){
+  onSubmit(){    
+    var today = new Date();
+    var todayString = convertToDateString(today);
+    this.taskForm.value.created_on = todayString;
     console.log(this.taskForm.value); 
     this.taskService.postTask(this.taskForm.value).subscribe((res) => {
       this.refreshTaskList();
