@@ -1,4 +1,4 @@
-import { Component, Input, SimpleChanges, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { Location } from '@angular/common';
@@ -13,15 +13,22 @@ import { User } from '../../user';
   providers: [UserService]
 })
 export class EditUserFormComponent implements OnInit {
-  @Input() selectedUser?: User;
+  defaultValues = {
+    _id: '',
+    name: '',
+    userGroup: '',
+    penalties: 0
+  }
 
-  userForm = this.formBuilder.group({
+  userForm = this.formBuilder.group(this.defaultValues);
+
+  user = {
     _id: '',
     name: '',
     password: '1234',
     userGroup: '',
     penalties: 0
-  });
+  } as User;
   
   constructor(
     private route: ActivatedRoute,
@@ -38,33 +45,14 @@ export class EditUserFormComponent implements OnInit {
     const id = this.route.snapshot.paramMap.get('id');
     this.userService.getUser(id!)
       .subscribe(user => {
-        this.selectedUser = user as User;        
-        this.resetForm();
-      });
+        this.user = user as User;  
+    });
   }
 
-  onSubmit(){
-    this.userService.putUser(this.userForm.value).subscribe((res) => {
+  onSubmit(){ 
+    this.userService.putUser(this.user).subscribe((res) => {
       this.goBack();
     });      
-  }
-
-  resetForm(){
-    if(this.selectedUser){
-      this.userForm.setValue({
-        _id: this.selectedUser._id,
-        name: this.selectedUser.name,
-        password: this.selectedUser.password,
-        userGroup: this.selectedUser.userGroup,
-        penalties: this.selectedUser.penalties
-      })
-    }
-    console.log('resetForm() selectedUser not defined');
-        
-  }
-
-  ngOnChanges(changes: SimpleChanges): void {
-    this.resetForm();
   }
 
   goBack(): void {

@@ -7,14 +7,16 @@
             minlength="3"
             type="text" class="form-control"
             id="nameInput" formControlName="name" 
+            [(ngModel)]="this.user.name"
         >
     </div>
     <div class="form-group">
         <label for="groupInput">User Group</label>
         <select 
           required
-          id="groupInput" formControlName="userGroup"
           class="form-control"
+          id="groupInput" formControlName="userGroup"
+          [(ngModel)]="this.user.userGroup"
         >
           <option value="admins">Admin</option>
           <option value="managers">Manager</option>
@@ -29,6 +31,7 @@
             type="number" class="form-control"
             min="0"
             id="penaltiesInput" formControlName="penalties" 
+            [(ngModel)]="this.user.penalties"
         >
     </div>
     <button *ngIf="userForm.valid" class="btn btn-lg btn-primary btn-block" type="submit">Edit User</button>        
