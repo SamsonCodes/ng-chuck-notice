@@ -8,6 +8,7 @@ import { Task } from '../task';
 })
 export class TaskService {
   tasksUrl = 'http://localhost:3000/api/tasks';
+  assignmentsUrl = 'http://localhost:3000/api/assignments';
 
   constructor(private http: HttpClient) { }
 
@@ -29,5 +30,9 @@ export class TaskService {
 
   deleteTask(taskId: string){
     return this.http.delete(this.tasksUrl + `/${taskId}`);
+  }
+
+  getTaskAssignments(taskId: string){
+    return this.http.get(this.assignmentsUrl +`/task/${taskId}`);
   }
 }

@@ -5,6 +5,9 @@ import { Location } from '@angular/common';
 
 import { TaskService } from '../../services/task.service';
 import { Task } from '../../task';
+import { Assignment } from 'src/app/assignment';
+import { UserService } from 'src/app/services/user.service';
+import { User } from 'src/app/user';
 
 
 @Component({
@@ -23,16 +26,20 @@ export class EditTaskComponent implements OnInit {
     status: ''
   }
   taskForm = this.formBuilder.group(this.defaultFormValues);  
+
+  userNames: string[] = [];
   
   constructor(
     private route: ActivatedRoute,
     private location: Location,
     private taskService: TaskService, 
+    private userService: UserService,
     private formBuilder: FormBuilder
   ) {}
 
   ngOnInit(): void {
     this.getTask();
+    this.getAssignments();
   }
 
   getTask(): void {
@@ -53,4 +60,17 @@ export class EditTaskComponent implements OnInit {
     this.location.back();
   }
 
+  getAssignments(): void {
+    const id = this.route.snapshot.paramMap.get('id');
+    this.taskService.getTaskAssignments(id!).subscribe((res)=>{
+      var assignments = res as Array<Assignment>;
+      assignments.forEach((assignment)=>{
+        var user_id = assignment.user_id;
+        this.userService.getUser(user_id).subscribe((userRes)=> {
+          var user = userRes as User;
+          this.userNames.push(user.name);      
+        });
+      })
+    })
+  }
 }

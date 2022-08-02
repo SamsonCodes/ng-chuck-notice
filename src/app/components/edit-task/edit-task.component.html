@@ -44,3 +44,11 @@
     </div>
     <button *ngIf="taskForm.valid" class="btn btn-lg btn-primary btn-block" type="submit">Edit Task</button>        
 </form>
+<div *ngIf="this.userNames.length > 0">
+    <h4>Assigned to:</h4>
+    <ul>
+        <li *ngFor="let name of this.userNames">
+            {{name}}
+        </li>  
+    </ul>      
+</div>
