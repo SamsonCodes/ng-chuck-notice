@@ -2,7 +2,8 @@ const Task = require('../models/task');
 
 //CREATE
 module.exports.addOne = function(req, res){ 
-    var newTask = new Task(req.body);
+    var newTaskData = unpackTaskData(req);
+    var newTask = new Task(newTaskData);
     newTask.save((err, doc) => {
         if(!err){ res.send(doc);}
         else {
@@ -37,7 +38,8 @@ module.exports.getOne = function (req, res) {
 
 //UPDATE
 module.exports.updateOne = function(req, res){ 
-    Task.findByIdAndUpdate(req.params.id, {$set : req.body }, {new: true}, (err, doc) => {
+    var newTaskData = unpackTaskData(req);
+    Task.findByIdAndUpdate(req.params.id, {$set : newTaskData }, {new: true}, (err, doc) => {
         if(!err){ res.send(doc);}
         else {
             console.log('Task update error:' + JSON.stringify(err, undefined, 2)); 
@@ -55,6 +57,18 @@ module.exports.deleteOne = function(req, res){
             res.send(err);
         }
     })
+}
+
+function unpackTaskData(req){
+    var newTaskData = {
+        title: req.body.title,
+        description: req.body.description,
+        deadline: req.body.deadline,
+        status: req.body.status,
+        created_by: req.body.created_by,
+        created_on: req.body.created_on
+    };
+    return newTaskData
 }
 
 function handleError(err, res) {

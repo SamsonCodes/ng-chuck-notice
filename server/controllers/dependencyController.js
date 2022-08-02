@@ -2,7 +2,8 @@ const Dependency = require('../models/dependency');
 
 //CREATE
 module.exports.addOne = function(req, res){ 
-    var newDependency = new Dependency(req.body);
+    var newDependencyData = unpackDependencyData(req);
+    var newDependency = new Dependency(newDependencyData);
     newDependency.save((err, doc) => {
         if(!err){ res.send(doc);}
         else {
@@ -37,7 +38,8 @@ module.exports.getOne = function (req, res) {
 
 //UPDATE
 module.exports.updateOne = function(req, res){ 
-    Dependency.findByIdAndUpdate(req.params.id, {$set : req.body }, {new: true}, (err, doc) => {
+    var newDependencyData = unpackBody(req);
+    Dependency.findByIdAndUpdate(req.params.id, {$set : newDependencyData }, {new: true}, (err, doc) => {
         if(!err){ res.send(doc);}
         else {
             console.log('Dependency update error:' + JSON.stringify(err, undefined, 2)); 
@@ -55,6 +57,14 @@ module.exports.deleteOne = function(req, res){
             res.send(err);
         }
     })
+}
+
+function unpackDependencyData(req){
+    var newDependencyData = new {
+        task_id: req.body.task_id,
+        dependency_id: req.body.dependency_id
+    };
+    return newDependencyData
 }
 
 function handleError(err, res) {

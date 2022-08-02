@@ -2,7 +2,8 @@ const Assignment = require('../models/assignment');
 
 //CREATE
 module.exports.addOne = function(req, res){ 
-    var newAssignment = new Assignment(req.body);
+    var newAssignmentData = unpackAssignmentData(req);
+    var newAssignment = new Assignment(newAssignmentData);
     newAssignment.save((err, doc) => {
         if(!err){ res.send(doc);}
         else {
@@ -37,7 +38,8 @@ module.exports.getOne = function (req, res) {
 
 //UPDATE
 module.exports.updateOne = function(req, res){ 
-    Assignment.findByIdAndUpdate(req.params.id, {$set : req.body }, {new: true}, (err, doc) => {
+    var newAssignmentData = unpackAssignmentData(req);
+    Assignment.findByIdAndUpdate(req.params.id, {$set : newAssignmentData }, {new: true}, (err, doc) => {
         if(!err){ res.send(doc);}
         else {
             console.log('Assignment update error:' + JSON.stringify(err, undefined, 2)); 
@@ -55,6 +57,14 @@ module.exports.deleteOne = function(req, res){
             res.send(err);
         }
     })
+}
+
+function unpackAssignmentData(req){
+    var newAssignmentData = new {
+        user_id: req.body.user_id,
+        task_id: req.body.task_id
+    };
+    return newAssignmentData
 }
 
 function handleError(err, res) {

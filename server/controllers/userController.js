@@ -2,14 +2,8 @@ const User = require('../models/user');
 
 //CREATE
 module.exports.addOne = function(req, res){ 
-    var newUser = new User(
-        {
-            name: req.body.name,
-            password: req.body.password,
-            userGroup: req.body.userGroup,
-            penalties: req.body.penalties
-        }
-    );
+    var newUserData = unpackUserData(req);
+    var newUser = new User(newUserData);
     newUser.save((err, doc) => {
         if(!err){ res.send(doc);}
         else {
@@ -44,7 +38,8 @@ module.exports.getOne = function (req, res) {
 
 //UPDATE
 module.exports.updateOne = function(req, res){ 
-    User.findByIdAndUpdate(req.params.id, {$set : req.body }, {new: true}, (err, doc) => {
+    var newUserData = unpackUserData(req);
+    User.findByIdAndUpdate(req.params.id, {$set : newUserData }, {new: true}, (err, doc) => {
         if(!err){ res.send(doc);}
         else {
             console.log('User update error:' + JSON.stringify(err, undefined, 2)); 
@@ -62,6 +57,16 @@ module.exports.deleteOne = function(req, res){
             res.send(err);
         }
     })
+}
+
+function unpackUserData(req){
+    var userData = {
+        name: req.body.name,
+        password: req.body.password,
+        userGroup: req.body.userGroup,
+        penalties: req.body.penalties
+    }
+    return userData;
 }
 
 function handleError(err, res) {
