@@ -60,7 +60,7 @@ module.exports.deleteOne = function(req, res){
 }
 
 function unpackDependencyData(req){
-    var newDependencyData = new {
+    var newDependencyData = {
         task_id: req.body.task_id,
         dependency_id: req.body.dependency_id
     };

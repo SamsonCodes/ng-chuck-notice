@@ -36,6 +36,18 @@ module.exports.getOne = function (req, res) {
         });
 };
 
+module.exports.getByTaskId = function(req, res){
+    var taskId = req.params.taskId;
+    Assignment
+        .find({task_id: taskId})
+        .exec(function (err, results) {
+            if (err) {
+                return handleError(err, res);
+            }
+            res.json(results);
+        });
+}
+
 //UPDATE
 module.exports.updateOne = function(req, res){ 
     var newAssignmentData = unpackAssignmentData(req);
@@ -60,7 +72,7 @@ module.exports.deleteOne = function(req, res){
 }
 
 function unpackAssignmentData(req){
-    var newAssignmentData = new {
+    var newAssignmentData = {
         user_id: req.body.user_id,
         task_id: req.body.task_id
     };
