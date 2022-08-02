@@ -20,7 +20,7 @@ export class TasksComponent implements OnInit {
     title: 'Title',
     description: 'Description',
     deadline: '',
-    status: 'Open',    
+    status: 'open',    
     created_by: '62e3e215e4c239fe3041682c',
     created_on: ''
   } as Task;
