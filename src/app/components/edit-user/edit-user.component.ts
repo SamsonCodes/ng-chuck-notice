@@ -13,13 +13,7 @@ import { User } from '../../user';
   providers: [UserService]
 })
 export class EditUserComponent implements OnInit {
-  selectedUser = {
-    _id: '',
-    name: '',
-    password: '1234',
-    userGroup: '',
-    penalties: 0
-  } as User;
+  selectedUser = {} as User;
 
   defaultFormValues = {
     name: '',
