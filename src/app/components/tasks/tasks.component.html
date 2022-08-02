@@ -58,7 +58,10 @@
       <td>{{task.status}}</td>
       <td>{{task.created_by}}</td>
       <td>{{task.created_on}}</td>
-      <td>        
+      <td>    
+        <a routerLink="/edit-task/{{task._id}}">
+            <i class="material-icons">edit</i>
+        </a>    
         <a (click)="onDelete(task._id)">
             <i class="material-icons">delete</i>
         </a>

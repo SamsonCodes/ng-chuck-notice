@@ -9,6 +9,7 @@ import { UsersComponent } from './components/users/users.component';
 import { EditUserComponent } from './components/edit-user/edit-user.component';
 import { AppRoutingModule } from './app-routing.module';
 import { TasksComponent } from './components/tasks/tasks.component';
+import { EditTaskComponent } from './components/edit-task/edit-task.component';
 
 
 @NgModule({
@@ -17,7 +18,8 @@ import { TasksComponent } from './components/tasks/tasks.component';
     HeaderComponent,
     UsersComponent,
     EditUserComponent,
-    TasksComponent
+    TasksComponent,
+    EditTaskComponent
   ],
   imports: [
     BrowserModule,

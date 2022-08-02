@@ -1,0 +1,14 @@
+<h1>Edit Task</h1>
+<form [formGroup]="taskForm" (ngSubmit)="onSubmit()">
+    <div class="form-group">
+        <label for="titleInput">Title</label>
+        <input 
+            required autofocus
+            minlength="3"
+            type="text" class="form-control"
+            id="titleInput" formControlName="title" 
+            [(ngModel)]="this.selectedTask.title"
+        >
+    </div>
+    <button *ngIf="taskForm.valid" class="btn btn-lg btn-primary btn-block" type="submit">Edit Task</button>        
+</form>
