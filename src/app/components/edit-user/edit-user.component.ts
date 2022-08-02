@@ -7,28 +7,26 @@ import { UserService } from '../../services/user.service';
 import { User } from '../../user';
 
 @Component({
-  selector: 'edit-user-form',
-  templateUrl: './edit-user-form.component.html',
-  styleUrls: ['./edit-user-form.component.css'],
+  selector: 'edit-user',
+  templateUrl: './edit-user.component.html',
+  styleUrls: ['./edit-user.component.css'],
   providers: [UserService]
 })
-export class EditUserFormComponent implements OnInit {
-  defaultValues = {
-    _id: '',
-    name: '',
-    userGroup: '',
-    penalties: 0
-  }
-
-  userForm = this.formBuilder.group(this.defaultValues);
-
-  user = {
+export class EditUserComponent implements OnInit {
+  selectedUser = {
     _id: '',
     name: '',
     password: '1234',
     userGroup: '',
     penalties: 0
   } as User;
+
+  defaultFormValues = {
+    name: '',
+    userGroup: '',
+    penalties: 0
+  }
+  userForm = this.formBuilder.group(this.defaultFormValues);  
   
   constructor(
     private route: ActivatedRoute,
@@ -45,12 +43,12 @@ export class EditUserFormComponent implements OnInit {
     const id = this.route.snapshot.paramMap.get('id');
     this.userService.getUser(id!)
       .subscribe(user => {
-        this.user = user as User;  
+        this.selectedUser = user as User;  
     });
   }
 
   onSubmit(){ 
-    this.userService.putUser(this.user).subscribe((res) => {
+    this.userService.putUser(this.selectedUser).subscribe((res) => {
       this.goBack();
     });      
   }

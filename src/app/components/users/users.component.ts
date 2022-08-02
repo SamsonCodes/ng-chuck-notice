@@ -13,21 +13,19 @@ import { User } from '../../user';
 export class UsersComponent implements OnInit {
   users: User[] = [];
 
-  defaultValues = {
-    _id: '',
-    name: '',
-    userGroup: '',
-  };
-
-  userForm = this.formBuilder.group(this.defaultValues);
-
-  user = {
+  newUser = {
     _id: '',
     name: '',
     password: '1234',
     userGroup: '',
     penalties: 0
   } as User;
+
+  defaultFormValues = {
+    name: '',
+    userGroup: '',
+  };
+  userForm = this.formBuilder.group(this.defaultFormValues);  
   
   constructor(
     private userService: UserService, 
@@ -39,18 +37,10 @@ export class UsersComponent implements OnInit {
   }
 
   onSubmit(){
-      this.userService.postUser(this.user).subscribe((res) => {
+    this.userService.postUser(this.newUser).subscribe((res) => {
       this.refreshUserList();
       this.resetForm();
     });      
-  }
-
-  resetForm(){
-    this.userForm.setValue({
-      _id: '',
-      name: '',
-      userGroup: ''
-    });
   }
 
   onDelete(userId: string){
@@ -63,5 +53,9 @@ export class UsersComponent implements OnInit {
     this.userService.getUsers().subscribe((res) => {
       this.users = res as User[];
     });
+  }
+
+  resetForm(){
+    this.userForm.setValue(this.defaultFormValues);
   }
 }

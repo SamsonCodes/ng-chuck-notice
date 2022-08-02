@@ -15,15 +15,8 @@ import { convertToDateString } from '../../dateHelper';
 export class TasksComponent implements OnInit {
   tasks: Task[] = [];
 
-  defaultValues = {
-    title: 'Title',
-    description: 'Description',
-    deadline: ''
-  }
-
-  taskForm = this.formBuilder.group(this.defaultValues);
-
-  task = {
+  newTask = {
+    _id: '',
     title: 'Title',
     description: 'Description',
     deadline: '',
@@ -31,6 +24,13 @@ export class TasksComponent implements OnInit {
     created_by: '62e3e215e4c239fe3041682c',
     created_on: ''
   } as Task;
+
+  defaultFormValues = {
+    title: 'Title',
+    description: 'Description',
+    deadline: ''
+  }
+  taskForm = this.formBuilder.group(this.defaultFormValues);  
   
   constructor(
     private taskService: TaskService, 
@@ -42,22 +42,11 @@ export class TasksComponent implements OnInit {
   }
 
   onSubmit(){        
-    this.task.created_on = this.getCreatedOn();
-    console.log(this.task); 
-    this.taskService.postTask(this.task).subscribe((res) => {
+    this.newTask.created_on = this.getCreatedOn();
+    this.taskService.postTask(this.newTask).subscribe((res) => {
       this.refreshTaskList();
       this.resetForm();
     });      
-  }
-
-  getCreatedOn(){
-    var today = new Date();
-    var todayString = convertToDateString(today);
-    return todayString
-  }
-
-  resetForm(){
-    this.taskForm.setValue(this.defaultValues);
   }
 
   onDelete(taskId: string){
@@ -66,13 +55,19 @@ export class TasksComponent implements OnInit {
     });
   }
 
+  getCreatedOn(){
+    var today = new Date();
+    var todayString = convertToDateString(today);
+    return todayString
+  }
+
   refreshTaskList(){
     this.taskService.getTasks().subscribe((res) => {
       this.tasks = res as Task[];
     });
   }
 
-  logger(){
-    console.log(this.taskForm.value);    
+  resetForm(){
+    this.taskForm.setValue(this.defaultFormValues);
   }
 }

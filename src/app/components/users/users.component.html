@@ -7,7 +7,7 @@
             minlength="3"
             type="text" class="form-control"
             id="nameInput" formControlName="name" 
-            [(ngModel)]="this.user.name"
+            [(ngModel)]="this.newUser.name"
         >
     </div>
     <div class="form-group">
@@ -16,7 +16,7 @@
           required
           class="form-control"
           id="groupInput" formControlName="userGroup"          
-          [(ngModel)]="this.user.userGroup"
+          [(ngModel)]="this.newUser.userGroup"
         >
           <option value="admins">Admin</option>
           <option value="managers">Manager</option>
