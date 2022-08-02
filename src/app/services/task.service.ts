@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
 import { Task } from '../task';
+import { Assignment } from '../assignment';
 
 @Injectable({
   providedIn: 'root'
@@ -32,7 +33,15 @@ export class TaskService {
     return this.http.delete(this.tasksUrl + `/${taskId}`);
   }
 
+  postAssignment(assignment: Assignment){
+    return this.http.post(this.assignmentsUrl, assignment);
+  }
+
   getTaskAssignments(taskId: string){
     return this.http.get(this.assignmentsUrl +`/task/${taskId}`);
+  }
+
+  deleteAssignment(id: string){
+    return this.http.delete(this.assignmentsUrl + `/${id}`);
   }
 }

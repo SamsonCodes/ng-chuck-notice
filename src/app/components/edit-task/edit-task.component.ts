@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Params } from '@angular/router';
 import { Location } from '@angular/common';
 
 import { TaskService } from '../../services/task.service';
@@ -19,15 +19,23 @@ export class EditTaskComponent implements OnInit {
   selectedTask = {
   } as Task;
 
-  defaultFormValues = {
+  defaultTaskFormValues = {
     title: '',
     description: '',
     deadline: '',
     status: ''
   }
-  taskForm = this.formBuilder.group(this.defaultFormValues);  
+  taskForm = this.formBuilder.group(this.defaultTaskFormValues);  
 
-  userNames: string[] = [];
+  assignmentForm = this.formBuilder.group({
+    user_id: ''
+  }); 
+
+  assignments: Assignment[] = [];
+  allUsers: User[] = [];
+  assignedUsers: User[] = [];
+
+  id: string = '';
   
   constructor(
     private route: ActivatedRoute,
@@ -38,38 +46,80 @@ export class EditTaskComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.getTask();
+    this.getId();
+    this.getTask();    
+    this.getAllUsers();
     this.getAssignments();
   }
 
+  getId(){
+    this.route.params.subscribe((params: Params) => {
+      this.id = params.id;
+    });
+  }
+
   getTask(): void {
-    const id = this.route.snapshot.paramMap.get('id');
-    this.taskService.getTask(id!)
+    this.taskService.getTask(this.id)
       .subscribe(task => {
         this.selectedTask = task as Task;  
     });
   }
 
-  onSubmit(){ 
+  onSubmit(): void { 
     this.taskService.putTask(this.selectedTask).subscribe((res) => {
       this.goBack();
     });      
+  }  
+
+  getAllUsers(): void {
+    this.userService.getUsers().subscribe((res)=>{
+      this.allUsers = res as User[];
+    });
+  }
+
+  onAssignment(): void {
+    var assignment = {
+      _id: '',
+      user_id: this.assignmentForm.value.user_id,
+      task_id: this.id
+    } as Assignment;
+    this.taskService.postAssignment(assignment).subscribe((res)=>{
+      this.assignmentForm.setValue({
+        user_id: ''
+      });
+      this.getAssignments();
+    })
+  }
+
+  removeAssignment(removeUserId: string): void {    
+    this.assignments.forEach((assignment)=>
+    {
+      if(assignment.user_id == removeUserId){
+        this.taskService.deleteAssignment(assignment._id).subscribe((res)=>{
+          this.getAssignments();
+        })
+      }
+    })
   }
 
   goBack(): void {
     this.location.back();
   }
 
-  getAssignments(): void {
-    const id = this.route.snapshot.paramMap.get('id');
-    this.taskService.getTaskAssignments(id!).subscribe((res)=>{
-      var assignments = res as Array<Assignment>;
-      assignments.forEach((assignment)=>{
-        var user_id = assignment.user_id;
-        this.userService.getUser(user_id).subscribe((userRes)=> {
-          var user = userRes as User;
-          this.userNames.push(user.name);      
-        });
+  getAssignments(): void {    
+    this.taskService.getTaskAssignments(this.id).subscribe((res)=>{
+      this.assignments = res as Array<Assignment>;   
+      this.getAssignedUsers();   
+    })
+  }
+
+  getAssignedUsers(): void {
+    this.assignedUsers = [];
+    this.assignments.forEach((assignment)=>{
+      this.allUsers.forEach((user)=>{
+        if(user._id == assignment.user_id){
+          this.assignedUsers.push(user);
+        }
       })
     })
   }
