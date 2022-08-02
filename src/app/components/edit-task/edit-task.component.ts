@@ -5,9 +5,6 @@ import { Location } from '@angular/common';
 
 import { TaskService } from '../../services/task.service';
 import { Task } from '../../task';
-import { Assignment } from 'src/app/assignment';
-import { UserService } from 'src/app/services/user.service';
-import { User } from 'src/app/user';
 
 
 @Component({
@@ -25,31 +22,20 @@ export class EditTaskComponent implements OnInit {
     deadline: '',
     status: ''
   }
-  taskForm = this.formBuilder.group(this.defaultTaskFormValues);  
-
-  assignmentForm = this.formBuilder.group({
-    user_id: ''
-  }); 
-
-  assignments: Assignment[] = [];
-  allUsers: User[] = [];
-  assignedUsers: User[] = [];
+  taskForm = this.formBuilder.group(this.defaultTaskFormValues);
 
   id: string = '';
   
   constructor(
     private route: ActivatedRoute,
     private location: Location,
-    private taskService: TaskService, 
-    private userService: UserService,
+    private taskService: TaskService,
     private formBuilder: FormBuilder
   ) {}
 
   ngOnInit(): void {
     this.getId();
-    this.getTask();    
-    this.getAllUsers();
-    this.getAssignments();
+    this.getTask();
   }
 
   getId(){
@@ -71,56 +57,7 @@ export class EditTaskComponent implements OnInit {
     });      
   }  
 
-  getAllUsers(): void {
-    this.userService.getUsers().subscribe((res)=>{
-      this.allUsers = res as User[];
-    });
-  }
-
-  onAssignment(): void {
-    var assignment = {
-      _id: '',
-      user_id: this.assignmentForm.value.user_id,
-      task_id: this.id
-    } as Assignment;
-    this.taskService.postAssignment(assignment).subscribe((res)=>{
-      this.assignmentForm.setValue({
-        user_id: ''
-      });
-      this.getAssignments();
-    })
-  }
-
-  removeAssignment(removeUserId: string): void {    
-    this.assignments.forEach((assignment)=>
-    {
-      if(assignment.user_id == removeUserId){
-        this.taskService.deleteAssignment(assignment._id).subscribe((res)=>{
-          this.getAssignments();
-        })
-      }
-    })
-  }
-
   goBack(): void {
     this.location.back();
-  }
-
-  getAssignments(): void {    
-    this.taskService.getTaskAssignments(this.id).subscribe((res)=>{
-      this.assignments = res as Array<Assignment>;   
-      this.getAssignedUsers();   
-    })
-  }
-
-  getAssignedUsers(): void {
-    this.assignedUsers = [];
-    this.assignments.forEach((assignment)=>{
-      this.allUsers.forEach((user)=>{
-        if(user._id == assignment.user_id){
-          this.assignedUsers.push(user);
-        }
-      })
-    })
   }
 }

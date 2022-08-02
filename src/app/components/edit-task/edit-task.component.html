@@ -44,27 +44,6 @@
     </div>
     <button *ngIf="taskForm.valid" class="btn btn-lg btn-primary btn-block" type="submit">Edit Task</button>        
 </form>
-<div *ngIf="this.assignedUsers.length > 0">
-    <h4>Assigned to:</h4>
-    <ul>
-        <li *ngFor="let user of this.assignedUsers">
-            {{user.name}}
-            <span (click)="removeAssignment(user._id)">
-                <i class="material-icons">delete</i>
-            </span>
-        </li>  
-    </ul>      
-</div>
-<form *ngIf="this.allUsers.length > 0" [formGroup]="assignmentForm" (ngSubmit)="onAssignment()">
-    <div class="form-group">
-        <label for="assignInput">Assign To:</label>
-        <select 
-          required
-          class="form-control"
-          id="assignInput" formControlName="user_id" 
-        >
-            <option *ngFor="let user of this.allUsers" value="{{user._id}}">{{user.name}}</option>
-        </select>
-    </div>
-    <button *ngIf="assignmentForm.valid">Assign</button>
-</form>
+<a routerLink="/assignments/{{this.id}}">
+    Assignments
+</a>
