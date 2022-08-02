@@ -10,5 +10,37 @@
             [(ngModel)]="this.selectedTask.title"
         >
     </div>
+    <div class="form-group">
+        <label for="descriptionInput">Description</label>
+        <input 
+            required
+            minlength="3"
+            type="text" class="form-control"
+            id="descriptionInput" formControlName="description" 
+            [(ngModel)]="this.selectedTask.description"
+        >
+    </div>
+    <div class="form-group">
+        <label for="deadlineInput">Deadline</label>
+        <input 
+            type="date" id="deadlineInput" formControlName="deadline"
+            min="2022-08-01" max="2052-12-31"
+            [(ngModel)]="this.selectedTask.deadline"
+        >
+    </div>
+    <div class="form-group">
+        <label for="statusInput">Status</label>
+        <select 
+          required
+          class="form-control"
+          id="statusInput" formControlName="status"          
+          [(ngModel)]="this.selectedTask.status"
+        >
+          <option value="waiting">Waiting</option>
+          <option value="open">Open</option>
+          <option value="in-progress">In progress</option>
+          <option value="finished">Finished</option>
+        </select>
+    </div>
     <button *ngIf="taskForm.valid" class="btn btn-lg btn-primary btn-block" type="submit">Edit Task</button>        
 </form>

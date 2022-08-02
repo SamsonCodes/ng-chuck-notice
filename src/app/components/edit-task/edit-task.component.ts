@@ -17,7 +17,10 @@ export class EditTaskComponent implements OnInit {
   } as Task;
 
   defaultFormValues = {
-    title: ''
+    title: '',
+    description: '',
+    deadline: '',
+    status: ''
   }
   taskForm = this.formBuilder.group(this.defaultFormValues);  
   
