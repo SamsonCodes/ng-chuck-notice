@@ -42,6 +42,18 @@
           <option value="finished">Finished</option>
         </select>
     </div>
+    <div formArrayName="assignments" class="form-group">
+        <h2>Assignments</h2>   
+        <div *ngFor="let assignment of formAssignments.controls; let i=index">
+            <!-- The repeated assignment template -->
+            <select id="assignment-{{ i }}" type="text" [formControlName]="i">
+                <option *ngFor="let user of this.allUsers" value="{{user._id}}">{{user.name}}</option>
+            </select>   
+            <span (click)="removeAssignment(i)">
+                <i class="material-icons">delete</i>
+            </span>       
+        </div>
+        <button type="button" (click)="addAssignment()">+ Add</button>
+    </div>
     <button *ngIf="taskForm.valid" class="btn btn-lg btn-primary btn-block" type="submit">Edit Task</button>        
 </form>
-<assignments task_id="this.id"></assignments>
