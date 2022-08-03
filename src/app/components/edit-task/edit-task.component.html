@@ -44,6 +44,4 @@
     </div>
     <button *ngIf="taskForm.valid" class="btn btn-lg btn-primary btn-block" type="submit">Edit Task</button>        
 </form>
-<a routerLink="/assignments/{{this.id}}">
-    Assignments
-</a>
+<assignments task_id="this.id"></assignments>

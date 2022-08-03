@@ -1,13 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
-import { ActivatedRoute, Params } from '@angular/router';
 import { Location } from '@angular/common';
 
 import { TaskService } from '../../services/task.service';
 import { Assignment } from 'src/app/assignment';
 import { UserService } from 'src/app/services/user.service';
 import { User } from 'src/app/user';
-import { Task } from 'src/app/task';
 
 @Component({
   selector: 'assignments',
@@ -15,15 +13,7 @@ import { Task } from 'src/app/task';
   styleUrls: ['./assignments.component.css']
 })
 export class AssignmentsComponent implements OnInit {
-  selectedTask = {
-    _id: '',
-    title: '',
-    description:'',
-    deadline: '',
-    status: '',
-    created_by: '',
-    created_on: ''
-  } as Task;
+  @Input() task_id: string ='';
 
   assignmentForm = this.formBuilder.group({
     user_id: ''
@@ -36,7 +26,6 @@ export class AssignmentsComponent implements OnInit {
   id: string = '';
 
   constructor(
-    private route: ActivatedRoute,
     private taskService: TaskService, 
     private userService: UserService,
     private formBuilder: FormBuilder,
@@ -44,23 +33,8 @@ export class AssignmentsComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.getId();
-    this.getTask();
     this.getAllUsers();
     this.getAssignments();
-  }
-
-  getId(){
-    this.route.params.subscribe((params: Params) => {
-      this.id = params.id;
-    });
-  }
-
-  getTask(): void {
-    this.taskService.getTask(this.id)
-      .subscribe(task => {
-        this.selectedTask = task as Task;  
-    });
   }
 
   getAllUsers(): void {
@@ -73,7 +47,7 @@ export class AssignmentsComponent implements OnInit {
     var assignment = {
       _id: '',
       user_id: this.assignmentForm.value.user_id,
-      task_id: this.id
+      task_id: this.task_id
     } as Assignment;
     this.taskService.postAssignment(assignment).subscribe((res)=>{
       this.assignmentForm.setValue({
@@ -95,7 +69,7 @@ export class AssignmentsComponent implements OnInit {
   }
 
   getAssignments(): void {    
-    this.taskService.getTaskAssignments(this.id).subscribe((res)=>{
+    this.taskService.getTaskAssignments(this.task_id).subscribe((res)=>{
       this.assignments = res as Array<Assignment>;   
       this.getAssignedUsers();   
     })
