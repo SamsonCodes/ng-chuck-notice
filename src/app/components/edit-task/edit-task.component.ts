@@ -9,6 +9,7 @@ import { AssignmentService } from 'src/app/services/assignment.service';
 import { Assignment } from 'src/app/assignment';
 import { User } from 'src/app/user';
 import { UserService } from 'src/app/services/user.service';
+import { fromEventPattern } from 'rxjs';
 
 
 @Component({
@@ -64,6 +65,30 @@ export class EditTaskComponent implements OnInit {
   }
 
   onSubmit(): void { 
+    var assignmentValues = this.taskForm.value.assignments;
+    console.log(assignmentValues);
+    console.log(this.assignments);
+    
+    //1) for indices corresponding to existing assignments, update if user_id has changed
+    for(let i = 0; i < this.assignments.length; i++){
+      if(assignmentValues[i] != this.assignments[i].user_id){
+        let newAssignment = {
+          _id: this.assignments[i]._id,
+          user_id: assignmentValues[i],
+          task_id: this.assignments[i].task_id
+        } as Assignment;
+        this.assignmentService.putAssignment(newAssignment).subscribe((res)=>{});
+      }
+    }
+    //2) for remaining indices add new assignment
+    for(let i = this.assignments.length; i < assignmentValues.length; i++){
+      let newAssignment = {
+        _id: '',
+        user_id: assignmentValues[i],
+        task_id: this.id
+      } as Assignment;
+      this.assignmentService.postAssignment(newAssignment).subscribe((res)=>{});
+    }
     this.taskService.putTask(this.selectedTask).subscribe((res) => {
       this.goBack();
     });      
@@ -71,8 +96,7 @@ export class EditTaskComponent implements OnInit {
 
   getAllUsers(): void {
     this.userService.getUsers().subscribe((res)=>{
-      this.allUsers = res as User[];
-      console.log(this.allUsers);      
+      this.allUsers = res as User[];  
     });
   }
   
@@ -96,7 +120,12 @@ export class EditTaskComponent implements OnInit {
   }
 
   removeAssignment(i: number): void {
-    console.log('removing assignment ' + i);    
+    this.formAssignments.removeAt(i);
+    if(this.assignments.length > 0 && i < this.assignments.length)    {
+      this.assignmentService.deleteAssignment(this.assignments[i]._id).subscribe((res)=>{
+        this.getAssignedUsers();
+      });
+    }
   }
 
   get formAssignments(){

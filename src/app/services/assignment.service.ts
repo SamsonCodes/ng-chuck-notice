@@ -19,6 +19,10 @@ export class AssignmentService {
     return this.http.get(this.assignmentsUrl +`/task/${taskId}`);
   }
 
+  putAssignment(assignment: Assignment){
+    return this.http.put(this.assignmentsUrl +`/${assignment._id}`, assignment);
+  }
+
   deleteAssignment(id: string){
     return this.http.delete(this.assignmentsUrl + `/${id}`);
   }
