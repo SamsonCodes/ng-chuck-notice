@@ -80,15 +80,10 @@ export class EditTaskComponent implements OnInit {
 
   getAllTasks(): void {
     this.taskService.getTasks().subscribe((res)=>{
-      let allTasks = res as Task[];
-      console.log(allTasks);      
-      console.log(this.id);
-      
+      let allTasks = res as Task[];      
       this.otherTasks = allTasks.filter(task=>
         (task._id != this.id)
-      )
-      console.log(this.otherTasks);
-      
+      )      
     })
   }
 
@@ -144,11 +139,36 @@ export class EditTaskComponent implements OnInit {
 
   onSubmit(): void {     
     this.submitAssignments(this.taskForm.value.assignments);    
-    this.submitDependencies(this.taskForm.value.dependencies);   
-    this.taskService.putTask(this.selectedTask).subscribe((res) => {
-      this.goBack();
-    });  
-  }  
+    this.submitDependencies(this.taskForm.value.dependencies).then(() => {
+        this.taskService.putTask(this.selectedTask).subscribe(() => {
+          this.taskService.getDependencyTasks(this.id).subscribe((dependencyTasks: Task[])=>{
+            let open = true;                 
+            for(let task of dependencyTasks){
+              if(open){            
+                if(task.status!='finished'){
+                  open = false;
+                  console.log(`task:${task.title}:${task.status}`);
+                  console.log('Still waiting on dependencies.');              
+                }
+              }
+              this.taskService.getTask(this.id).subscribe((res)=>{
+                let selectedTask = res as Task;
+                if (!open) {
+                  selectedTask.status = 'waiting';
+                }
+                else if(selectedTask.status == 'waiting'){
+                  selectedTask.status = 'open';
+                }
+                this.taskService.putTask(selectedTask).subscribe((res) => {                  
+                  this.goBack();
+                });
+              })          
+            }
+          })
+        });
+      }     
+    );  
+  }
 
   onDelete(): void {
     this.taskService.deleteTask(this.id).subscribe((res)=>{
@@ -185,11 +205,12 @@ export class EditTaskComponent implements OnInit {
     }
   }
 
-  submitDependencies(formDependencyValues: Array<string>): void {   
+  submitDependencies(formDependencyValues: Array<string>): any {   
     let databaseAmount =  this.dependencies.length;
     let formAmount = formDependencyValues.length;
 
     let existingIndices = this.range(0, databaseAmount - 1);
+    let serviceCalls: any[] = [];
     for(let i of existingIndices){
       if(formDependencyValues[i] != this.dependencies[i].dependency_id){
         let updatedDependency = {
@@ -197,7 +218,7 @@ export class EditTaskComponent implements OnInit {
           dependency_id: formDependencyValues[i],
           task_id: this.dependencies[i].task_id
         } as Dependency;
-        this.dependencyService.putDependency(updatedDependency).subscribe((res)=>{});
+        serviceCalls.push(this.dependencyService.putDependency(updatedDependency).toPromise());;
       }
     }
 
@@ -209,9 +230,10 @@ export class EditTaskComponent implements OnInit {
           dependency_id: formDependencyValues[i],
           task_id: this.id
         } as Dependency;
-        this.dependencyService.postDependency(newDependency).subscribe((res)=>{});
+        serviceCalls.push(this.dependencyService.postDependency(newDependency).toPromise());
       }
     }
+    return Promise.all(serviceCalls);
   }
 
   get formAssignments(){

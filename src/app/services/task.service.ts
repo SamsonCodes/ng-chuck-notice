@@ -5,6 +5,7 @@ import { Task } from '../classes/task';
 import { AssignmentService } from './assignment.service';
 import { Assignment } from '../classes/assignment';
 import { DependencyService } from './dependency.service';
+import { Dependency } from '../classes/dependency';
 
 @Injectable({
   providedIn: 'root'
@@ -35,6 +36,26 @@ export class TaskService {
   }
 
   deleteTask(taskId: string){
+    this.deleteAssignments(taskId);
+    this.deleteDependenciesOf(taskId);
+    this.deleteDependenciesOn(taskId);
+    return this.http.delete(this.tasksUrl + `/${taskId}`);
+  }
+
+  getDependencyTasks(taskId: string): any {
+    console.log(`Getting dependency for task:${taskId}`);    
+    this.dependencyService.getTaskDependencies(taskId).subscribe((results)=>{
+      let dependencies = results as Array<Dependency>;
+      let taskCalls: any[] = [];
+      dependencies.forEach((dependency)=>{
+        const taskCall = this.getTask(dependency.dependency_id).toPromise();
+        taskCalls.push(taskCall);
+      })
+      return Promise.all(taskCalls);
+    })
+  }
+
+  private deleteAssignments(taskId: string){
     this.assignmentService.getTaskAssignments(taskId)
       .subscribe((results) => {
         let taskAssignments = results as Array<Assignment>;
@@ -42,7 +63,9 @@ export class TaskService {
           this.assignmentService.deleteAssignment(assignment._id).subscribe();
         })
       })
-    // Remove all dependencies OF this task
+  }
+
+  private deleteDependenciesOf(taskId: string){
     this.dependencyService.getTaskDependencies(taskId)
       .subscribe((results) => {
         let taskDependencies = results as Array<Assignment>;
@@ -50,7 +73,9 @@ export class TaskService {
           this.dependencyService.deleteDependency(dependency._id).subscribe();
         })
       })
-    // Remove all dependencies ON this task
+  }
+
+  private deleteDependenciesOn(taskId: string){
     this.dependencyService.getDependenciesOn(taskId)
       .subscribe((results) => {
         let dependenciesOn = results as Array<Assignment>;
@@ -58,6 +83,5 @@ export class TaskService {
           this.dependencyService.deleteDependency(dependency._id).subscribe();
         })
       })
-    return this.http.delete(this.tasksUrl + `/${taskId}`);
   }
 }
