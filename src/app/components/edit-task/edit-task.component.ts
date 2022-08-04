@@ -4,10 +4,10 @@ import { ActivatedRoute, Params } from '@angular/router';
 import { Location } from '@angular/common';
 
 import { TaskService } from '../../services/task.service';
-import { Task } from '../../task';
+import { Task } from '../../classes/task';
 import { AssignmentService } from 'src/app/services/assignment.service';
-import { Assignment } from 'src/app/assignment';
-import { User } from 'src/app/user';
+import { Assignment } from 'src/app/classes/assignment';
+import { User } from 'src/app/classes/user';
 import { UserService } from 'src/app/services/user.service';
 
 

@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 
 import { UserService } from '../../services/user.service';
-import { User } from '../../user';
+import { User } from '../../classes/user';
 
 @Component({
   selector: 'users',

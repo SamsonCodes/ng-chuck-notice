@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
-import { Task } from '../task';
+import { Task } from '../classes/task';
 import { AssignmentService } from './assignment.service';
-import { Assignment } from '../assignment';
+import { Assignment } from '../classes/assignment';
 
 @Injectable({
   providedIn: 'root'

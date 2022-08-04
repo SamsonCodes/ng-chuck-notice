@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
-import { Assignment } from '../assignment';
+import { Assignment } from '../classes/assignment';
 
 @Injectable({
   providedIn: 'root'

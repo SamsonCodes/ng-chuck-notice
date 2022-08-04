@@ -4,7 +4,7 @@ import { ActivatedRoute } from '@angular/router';
 import { Location } from '@angular/common';
 
 import { UserService } from '../../services/user.service';
-import { User } from '../../user';
+import { User } from '../../classes/user';
 
 @Component({
   selector: 'edit-user',
