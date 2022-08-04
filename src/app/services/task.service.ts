@@ -4,6 +4,7 @@ import { HttpClient } from '@angular/common/http';
 import { Task } from '../classes/task';
 import { AssignmentService } from './assignment.service';
 import { Assignment } from '../classes/assignment';
+import { DependencyService } from './dependency.service';
 
 @Injectable({
   providedIn: 'root'
@@ -13,7 +14,8 @@ export class TaskService {
 
   constructor(
     private http: HttpClient,
-    private assignmentService: AssignmentService
+    private assignmentService: AssignmentService,
+    private dependencyService: DependencyService
     ) { }
 
   postTask(task: Task){
@@ -38,6 +40,22 @@ export class TaskService {
         let taskAssignments = results as Array<Assignment>;
         taskAssignments.forEach((assignment)=>{
           this.assignmentService.deleteAssignment(assignment._id).subscribe();
+        })
+      })
+    // Remove all dependencies OF this task
+    this.dependencyService.getTaskDependencies(taskId)
+      .subscribe((results) => {
+        let taskDependencies = results as Array<Assignment>;
+        taskDependencies.forEach((dependency)=>{
+          this.dependencyService.deleteDependency(dependency._id).subscribe();
+        })
+      })
+    // Remove all dependencies ON this task
+    this.dependencyService.getDependenciesOn(taskId)
+      .subscribe((results) => {
+        let dependenciesOn = results as Array<Assignment>;
+        dependenciesOn.forEach((dependency)=>{
+          this.dependencyService.deleteDependency(dependency._id).subscribe();
         })
       })
     return this.http.delete(this.tasksUrl + `/${taskId}`);

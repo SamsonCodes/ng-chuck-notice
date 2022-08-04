@@ -48,6 +48,18 @@ module.exports.getByTaskId = function(req, res){
         });
 }
 
+module.exports.getByDependencyId = function(req, res){
+    var depId = req.params.dependencyId;
+    Dependency
+        .find({dependency_id: depId})
+        .exec(function (err, results) {
+            if (err) {
+                return handleError(err, res);
+            }
+            res.json(results);
+        });
+}
+
 //UPDATE
 module.exports.updateOne = function(req, res){ 
     var newDependencyData = unpackBody(req);

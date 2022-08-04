@@ -19,6 +19,10 @@ export class DependencyService {
     return this.http.get(this.dependenciesUrl +`/task/${taskId}`);
   }
 
+  getDependenciesOn(taskId: string){
+    return this.http.get(this.dependenciesUrl +`/dependency/${taskId}`);
+  }
+
   putDependency(dependency: Dependency){
     return this.http.put(this.dependenciesUrl +`/${dependency._id}`, dependency);
   }
