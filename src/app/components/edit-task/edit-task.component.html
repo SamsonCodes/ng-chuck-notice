@@ -55,5 +55,7 @@
         </div>
         <button type="button" (click)="addAssignment()">+ Add</button>
     </div>
-    <button *ngIf="taskForm.valid" class="btn btn-lg btn-primary btn-block" type="submit">Edit Task</button>        
+    <button *ngIf="taskForm.valid" class="btn btn-lg btn-primary btn-block" type="submit">Edit Task</button>    
+           
 </form>
+<button class="btn btn-lg btn-primary btn-block" (click)="onDelete()">Delete</button>

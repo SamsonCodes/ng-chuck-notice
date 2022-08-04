@@ -102,6 +102,12 @@ export class EditTaskComponent implements OnInit {
          
   }  
 
+  onDelete(): void {
+    this.taskService.deleteTask(this.id).subscribe((res)=>{
+      this.goBack();
+    })   
+  }
+
   submitAssignments(formAssignmentValues: Array<string>): void {   
     let databaseAmount =  this.assignments.length;
     let formAmount = formAssignmentValues.length;
