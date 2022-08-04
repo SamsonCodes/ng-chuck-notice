@@ -6,7 +6,7 @@ import { Dependency } from '../classes/dependency';
 @Injectable({
   providedIn: 'root'
 })
-export class Dependencieservice {
+export class DependencyService {
   dependenciesUrl = 'http://localhost:3000/api/dependencies';
 
   constructor(private http: HttpClient) { }

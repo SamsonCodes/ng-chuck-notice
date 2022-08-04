@@ -9,7 +9,7 @@ import { AssignmentService } from 'src/app/services/assignment.service';
 import { Assignment } from 'src/app/classes/assignment';
 import { UserService } from 'src/app/services/user.service';
 import { User } from 'src/app/classes/user';
-import { Dependencieservice } from 'src/app/services/dependency.service';
+import { DependencyService } from 'src/app/services/dependency.service';
 import { Dependency } from 'src/app/classes/dependency';
 
 
@@ -47,7 +47,7 @@ export class EditTaskComponent implements OnInit {
     private taskService: TaskService,
     private assignmentService: AssignmentService,
     private userService: UserService,
-    private dependencyService: Dependencieservice,
+    private dependencyService: DependencyService,
     private fb: FormBuilder
   ) {}
 
@@ -80,7 +80,7 @@ export class EditTaskComponent implements OnInit {
 
   getAllTasks(): void {
     this.taskService.getTasks().subscribe((res)=>{
-      var allTasks = res as Task[];
+      let allTasks = res as Task[];
       console.log(allTasks);      
       console.log(this.id);
       
@@ -254,15 +254,15 @@ export class EditTaskComponent implements OnInit {
     this.location.back();
   }
   
-  range(start: number, finish: number): Array<number>{
-    if(start == 0){
-      return Array.from(Array(finish + 1).keys()); //Example: (0,3) => [0,1,2,3]
+  range(from: number, to: number): Array<number>{
+    if(from == 0){
+      return Array.from(Array(to + 1).keys()); //Example: range(0,3) => [0,1,2,3]
     }
     else {
-      let length = (finish + 1) - start;
-      var tempRange = Array.from(Array(length).keys());
-      var range = tempRange.map((val)=>{return val + start})
-      return range; //Example: (1,3) returns [1,3]
+      let length = (to + 1) - from;
+      let tempRange = Array.from(Array(length).keys());
+      let range = tempRange.map((val)=>{return val + from})
+      return range; //Example: range(1,3) returns [1,2,3]
     }    
   }
 
