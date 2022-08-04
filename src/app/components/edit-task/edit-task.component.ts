@@ -7,8 +7,10 @@ import { TaskService } from '../../services/task.service';
 import { Task } from '../../classes/task';
 import { AssignmentService } from 'src/app/services/assignment.service';
 import { Assignment } from 'src/app/classes/assignment';
-import { User } from 'src/app/classes/user';
 import { UserService } from 'src/app/services/user.service';
+import { User } from 'src/app/classes/user';
+import { Dependencieservice } from 'src/app/services/dependency.service';
+import { Dependency } from 'src/app/classes/dependency';
 
 
 @Component({
@@ -25,7 +27,8 @@ export class EditTaskComponent implements OnInit {
     description: '',
     deadline: '',
     status: '',
-    assignments: this.fb.array([])
+    assignments: this.fb.array([]),
+    dependencies: this.fb.array([])
   });
 
   id: string = '';
@@ -33,6 +36,10 @@ export class EditTaskComponent implements OnInit {
   allUsers: User[] = [];
   assignments: Assignment[] = [];  
   assignedUsers: User[] = [];
+
+  allTasks: Task[] = [];
+  dependencies: Dependency[] = []; 
+  dependencyTasks: Task[] = [];
   
   constructor(
     private route: ActivatedRoute,
@@ -40,6 +47,7 @@ export class EditTaskComponent implements OnInit {
     private taskService: TaskService,
     private assignmentService: AssignmentService,
     private userService: UserService,
+    private dependencyService: Dependencieservice,
     private fb: FormBuilder
   ) {}
 
@@ -47,7 +55,9 @@ export class EditTaskComponent implements OnInit {
     this.getId();
     this.getTask();
     this.getAllUsers();
+    this.getAllTasks();
     this.getAssignments();
+    this.getDependencies();
   }
 
   getId(): void {
@@ -66,6 +76,12 @@ export class EditTaskComponent implements OnInit {
     this.userService.getUsers().subscribe((res)=>{
       this.allUsers = res as User[];  
     });
+  }
+
+  getAllTasks(): void {
+    this.taskService.getTasks().subscribe((res)=>{
+      this.allTasks = res as Task[];
+    })
   }
 
   getAssignments(): void {    
@@ -93,12 +109,37 @@ export class EditTaskComponent implements OnInit {
     }
   }
 
+  getDependencies(): void {
+    this.dependencyService.getTaskDependencies(this.id).subscribe((res)=>{
+      this.dependencies = res as Array<Dependency>;   
+      this.getDependencyTasks();   
+      this.selectDependencies();
+    })
+  }
+
+  getDependencyTasks(): void {
+    this.dependencyTasks = [];
+    this.dependencies.forEach((dependency)=>{
+      this.allTasks.forEach((task)=>{
+        if(task._id == dependency.dependency_id){
+          this.dependencyTasks.push(task);
+        }
+      })
+    })
+  }
+
+  selectDependencies(): void {
+    for(let dependency of this.dependencies){
+      this.formDependencies.push(this.fb.control(dependency.dependency_id));
+    }
+  }
+
   onSubmit(): void {     
-    var formAssignmentValues = this.taskForm.value.assignments;
-    this.submitAssignments(formAssignmentValues); 
+    this.submitAssignments(this.taskForm.value.assignments);    
+    this.submitDependencies(this.taskForm.value.dependencies);   
     this.taskService.putTask(this.selectedTask).subscribe((res) => {
       this.goBack();
-    });         
+    });  
   }  
 
   onDelete(): void {
@@ -136,6 +177,35 @@ export class EditTaskComponent implements OnInit {
     }
   }
 
+  submitDependencies(formDependencyValues: Array<string>): void {   
+    let databaseAmount =  this.dependencies.length;
+    let formAmount = formDependencyValues.length;
+
+    let existingIndices = this.range(0, databaseAmount - 1);
+    for(let i of existingIndices){
+      if(formDependencyValues[i] != this.dependencies[i].dependency_id){
+        let updatedDependency = {
+          _id: this.dependencies[i]._id,
+          dependency_id: formDependencyValues[i],
+          task_id: this.dependencies[i].task_id
+        } as Dependency;
+        this.dependencyService.putDependency(updatedDependency).subscribe((res)=>{});
+      }
+    }
+
+    if(databaseAmount < formAmount){
+      let newIndices = this.range(databaseAmount, formAmount - 1);
+      for(let i of newIndices){
+        let newDependency = {
+          _id: '',
+          dependency_id: formDependencyValues[i],
+          task_id: this.id
+        } as Dependency;
+        this.dependencyService.postDependency(newDependency).subscribe((res)=>{});
+      }
+    }
+  }
+
   get formAssignments(){
     return this.taskForm.get('assignments') as FormArray;
   }
@@ -150,6 +220,24 @@ export class EditTaskComponent implements OnInit {
       this.assignmentService.deleteAssignment(this.assignments[i]._id).subscribe((res)=>{
         this.assignments.splice(i, 1);
         this.getAssignedUsers();
+      });
+    }
+  }
+
+  get formDependencies(){
+    return this.taskForm.get('dependencies') as FormArray;
+  }
+
+  addDependency(): void {
+    this.formDependencies.push(this.fb.control(''));
+  }
+
+  removeDependency(i: number): void {
+    this.formDependencies.removeAt(i);
+    if(this.dependencies.length > 0 && i < this.dependencies.length)    {
+      this.dependencyService.deleteDependency(this.dependencies[i]._id).subscribe((res)=>{
+        this.dependencies.splice(i, 1);
+        this.getDependencyTasks();
       });
     }
   }

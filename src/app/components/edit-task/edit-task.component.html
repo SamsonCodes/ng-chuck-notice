@@ -54,6 +54,18 @@
             </span>       
         </div>
         <button type="button" (click)="addAssignment()">+ Add</button>
+    </div><div formArrayName="dependencies" class="form-group">
+        <h2>Dependencies</h2>   
+        <div *ngFor="let dependency of formDependencies.controls; let i=index">
+            <!-- The repeated dependency template -->
+            <select id="dependency-{{ i }}" type="text" [formControlName]="i">
+                <option *ngFor="let task of this.allTasks" value="{{task._id}}">{{task.title}}</option>
+            </select>   
+            <span (click)="removeDependency(i)">
+                <i class="material-icons">delete</i>
+            </span>       
+        </div>
+        <button type="button" (click)="addDependency()">+ Add</button>
     </div>
     <button *ngIf="taskForm.valid" class="btn btn-lg btn-primary btn-block" type="submit">Edit Task</button>    
            
