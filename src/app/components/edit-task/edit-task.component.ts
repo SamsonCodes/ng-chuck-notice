@@ -9,7 +9,6 @@ import { AssignmentService } from 'src/app/services/assignment.service';
 import { Assignment } from 'src/app/assignment';
 import { User } from 'src/app/user';
 import { UserService } from 'src/app/services/user.service';
-import { fromEventPattern } from 'rxjs';
 
 
 @Component({
@@ -51,55 +50,24 @@ export class EditTaskComponent implements OnInit {
     this.getAssignments();
   }
 
-  getId(){
+  getId(): void {
     this.route.params.subscribe((params: Params) => {
       this.id = params.id;
     });
   }
 
   getTask(): void {
-    this.taskService.getTask(this.id)
-      .subscribe(task => {
+    this.taskService.getTask(this.id).subscribe(task => {
         this.selectedTask = task as Task;  
     });
   }
-
-  onSubmit(): void { 
-    var assignmentValues = this.taskForm.value.assignments;
-    console.log(assignmentValues);
-    console.log(this.assignments);
-    
-    //1) for indices corresponding to existing assignments, update if user_id has changed
-    for(let i = 0; i < this.assignments.length; i++){
-      if(assignmentValues[i] != this.assignments[i].user_id){
-        let newAssignment = {
-          _id: this.assignments[i]._id,
-          user_id: assignmentValues[i],
-          task_id: this.assignments[i].task_id
-        } as Assignment;
-        this.assignmentService.putAssignment(newAssignment).subscribe((res)=>{});
-      }
-    }
-    //2) for remaining indices add new assignment
-    for(let i = this.assignments.length; i < assignmentValues.length; i++){
-      let newAssignment = {
-        _id: '',
-        user_id: assignmentValues[i],
-        task_id: this.id
-      } as Assignment;
-      this.assignmentService.postAssignment(newAssignment).subscribe((res)=>{});
-    }
-    this.taskService.putTask(this.selectedTask).subscribe((res) => {
-      this.goBack();
-    });      
-  } 
 
   getAllUsers(): void {
     this.userService.getUsers().subscribe((res)=>{
       this.allUsers = res as User[];  
     });
   }
-  
+
   getAssignments(): void {    
     this.assignmentService.getTaskAssignments(this.id).subscribe((res)=>{
       this.assignments = res as Array<Assignment>;   
@@ -119,12 +87,47 @@ export class EditTaskComponent implements OnInit {
     })
   }
 
-  removeAssignment(i: number): void {
-    this.formAssignments.removeAt(i);
-    if(this.assignments.length > 0 && i < this.assignments.length)    {
-      this.assignmentService.deleteAssignment(this.assignments[i]._id).subscribe((res)=>{
-        this.getAssignedUsers();
-      });
+  selectAssignments(): void {
+    for(let assignment of this.assignments){
+      this.formAssignments.push(this.fb.control(assignment.user_id));
+    }
+  }
+
+  onSubmit(): void {     
+    var formAssignmentValues = this.taskForm.value.assignments;
+    this.submitAssignments(formAssignmentValues); 
+    this.taskService.putTask(this.selectedTask).subscribe((res) => {
+      this.goBack();
+    });
+         
+  }  
+
+  submitAssignments(formAssignmentValues: Array<string>): void {   
+    let databaseAmount =  this.assignments.length;
+    let formAmount = formAssignmentValues.length;
+
+    let existingIndices = this.range(0, databaseAmount - 1);
+    for(let i of existingIndices){
+      if(formAssignmentValues[i] != this.assignments[i].user_id){
+        let updatedAssignment = {
+          _id: this.assignments[i]._id,
+          user_id: formAssignmentValues[i],
+          task_id: this.assignments[i].task_id
+        } as Assignment;
+        this.assignmentService.putAssignment(updatedAssignment).subscribe((res)=>{});
+      }
+    }
+
+    if(databaseAmount < formAmount){
+      let newIndices = this.range(databaseAmount, formAmount - 1);
+      for(let i of newIndices){
+        let newAssignment = {
+          _id: '',
+          user_id: formAssignmentValues[i],
+          task_id: this.id
+        } as Assignment;
+        this.assignmentService.postAssignment(newAssignment).subscribe((res)=>{});
+      }
     }
   }
 
@@ -132,17 +135,38 @@ export class EditTaskComponent implements OnInit {
     return this.taskForm.get('assignments') as FormArray;
   }
 
-  addAssignment(){
+  addAssignment(): void {
     this.formAssignments.push(this.fb.control(''));
   }
 
-  selectAssignments(){
-    for(let assignment of this.assignments){
-      this.formAssignments.push(this.fb.control(assignment.user_id));
+  removeAssignment(i: number): void {
+    this.formAssignments.removeAt(i);
+    if(this.assignments.length > 0 && i < this.assignments.length)    {
+      this.assignmentService.deleteAssignment(this.assignments[i]._id).subscribe((res)=>{
+        this.assignments.splice(i, 1);
+        this.getAssignedUsers();
+      });
     }
   }
 
   goBack(): void {
     this.location.back();
+  }
+
+  
+  range(start: number, finish: number): Array<number>{
+    if(start == 0){
+      return Array.from(Array(finish + 1).keys()); //Example: (0,3) => [0,1,2,3]
+    }
+    else {
+      let length = (finish + 1) - start;
+      var tempRange = Array.from(Array(length).keys());
+      var range = tempRange.map((val)=>{return val + start})
+      return range; //Example: (1,3) returns [1,3]
+    }    
+  }
+
+  logger(): void{
+    // console.log(this.taskForm.value);    
   }
 }
