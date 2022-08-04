@@ -152,7 +152,6 @@ export class EditTaskComponent implements OnInit {
   goBack(): void {
     this.location.back();
   }
-
   
   range(start: number, finish: number): Array<number>{
     if(start == 0){

@@ -2,6 +2,8 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
 import { Task } from '../task';
+import { AssignmentService } from './assignment.service';
+import { Assignment } from '../assignment';
 
 @Injectable({
   providedIn: 'root'
@@ -9,7 +11,10 @@ import { Task } from '../task';
 export class TaskService {
   tasksUrl = 'http://localhost:3000/api/tasks';  
 
-  constructor(private http: HttpClient) { }
+  constructor(
+    private http: HttpClient,
+    private assignmentService: AssignmentService
+    ) { }
 
   postTask(task: Task){
     return this.http.post(this.tasksUrl, task);
@@ -28,6 +33,13 @@ export class TaskService {
   }
 
   deleteTask(taskId: string){
+    this.assignmentService.getTaskAssignments(taskId)
+      .subscribe((results) => {
+        let taskAssignments = results as Array<Assignment>;
+        taskAssignments.forEach((assignment)=>{
+          this.assignmentService.deleteAssignment(assignment._id).subscribe();
+        })
+      })
     return this.http.delete(this.tasksUrl + `/${taskId}`);
   }
 }
