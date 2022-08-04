@@ -10,6 +10,7 @@ router.use(morgan("combined"));
 router.post('/', dependencyController.addOne);
 router.get('/', dependencyController.list);
 router.get('/:id', dependencyController.getOne);
+router.get('/task/:taskId', dependencyController.getByTaskId);
 router.put('/:id', dependencyController.updateOne);
 router.delete('/:id', dependencyController.deleteOne);
 
