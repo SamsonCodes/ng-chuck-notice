@@ -59,7 +59,7 @@
         <div *ngFor="let dependency of formDependencies.controls; let i=index">
             <!-- The repeated dependency template -->
             <select id="dependency-{{ i }}" type="text" [formControlName]="i">
-                <option *ngFor="let task of this.allTasks" value="{{task._id}}">{{task.title}}</option>
+                <option *ngFor="let task of this.otherTasks" value="{{task._id}}">{{task.title}}</option>
             </select>   
             <span (click)="removeDependency(i)">
                 <i class="material-icons">delete</i>

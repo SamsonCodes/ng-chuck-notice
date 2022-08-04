@@ -37,7 +37,7 @@ export class EditTaskComponent implements OnInit {
   assignments: Assignment[] = [];  
   assignedUsers: User[] = [];
 
-  allTasks: Task[] = [];
+  otherTasks: Task[] = [];
   dependencies: Dependency[] = []; 
   dependencyTasks: Task[] = [];
   
@@ -80,7 +80,15 @@ export class EditTaskComponent implements OnInit {
 
   getAllTasks(): void {
     this.taskService.getTasks().subscribe((res)=>{
-      this.allTasks = res as Task[];
+      var allTasks = res as Task[];
+      console.log(allTasks);      
+      console.log(this.id);
+      
+      this.otherTasks = allTasks.filter(task=>
+        (task._id != this.id)
+      )
+      console.log(this.otherTasks);
+      
     })
   }
 
@@ -120,7 +128,7 @@ export class EditTaskComponent implements OnInit {
   getDependencyTasks(): void {
     this.dependencyTasks = [];
     this.dependencies.forEach((dependency)=>{
-      this.allTasks.forEach((task)=>{
+      this.otherTasks.forEach((task)=>{
         if(task._id == dependency.dependency_id){
           this.dependencyTasks.push(task);
         }
