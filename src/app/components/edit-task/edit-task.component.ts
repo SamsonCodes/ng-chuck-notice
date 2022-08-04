@@ -98,8 +98,7 @@ export class EditTaskComponent implements OnInit {
     this.submitAssignments(formAssignmentValues); 
     this.taskService.putTask(this.selectedTask).subscribe((res) => {
       this.goBack();
-    });
-         
+    });         
   }  
 
   onDelete(): void {

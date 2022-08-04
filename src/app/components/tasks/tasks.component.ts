@@ -3,7 +3,6 @@ import { FormBuilder } from '@angular/forms';
 
 import { TaskService } from '../../services/task.service';
 import { Task } from '../../task';
-
 import { convertToDateString } from '../../dateHelper';
 
 @Component({
@@ -40,6 +39,12 @@ export class TasksComponent implements OnInit {
   ngOnInit(): void {
     this.refreshTaskList();
   }
+  
+  refreshTaskList(){
+    this.taskService.getTasks().subscribe((res) => {
+      this.tasks = res as Task[];
+    });
+  }
 
   onSubmit(){        
     this.newTask.created_on = this.getCreatedOn();
@@ -49,25 +54,19 @@ export class TasksComponent implements OnInit {
     });      
   }
 
-  onDelete(taskId: string){
-    this.taskService.deleteTask(taskId).subscribe((res) => {
-      this.refreshTaskList();
-    });
-  }
-
   getCreatedOn(){
     var today = new Date();
     var todayString = convertToDateString(today);
     return todayString
   }
 
-  refreshTaskList(){
-    this.taskService.getTasks().subscribe((res) => {
-      this.tasks = res as Task[];
-    });
-  }
-
   resetForm(){
     this.taskForm.setValue(this.defaultFormValues);
   }
+
+  onDelete(taskId: string){
+    this.taskService.deleteTask(taskId).subscribe((res) => {
+      this.refreshTaskList();
+    });
+  }  
 }
