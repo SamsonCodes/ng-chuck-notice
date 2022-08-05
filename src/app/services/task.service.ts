@@ -33,7 +33,18 @@ export class TaskService {
   }
 
   putTask(task: Task){
-    return this.http.put(this.tasksUrl + `/${task._id}`, task);
+    let observable = new Observable(observer=>{
+      this.dependencyCheck(task).subscribe(open=>{
+        if(!open){
+          task.status = 'waiting'
+        }
+        if(task.status == 'finished'){
+          console.log('Todo: updating status of tasks depending on this finished task');
+        }
+        observer.next(this.http.put(this.tasksUrl + `/${task._id}`, task));
+      }) 
+    })
+    return observable;
   }
 
   deleteTask(taskId: string){
@@ -43,18 +54,17 @@ export class TaskService {
     return this.http.delete(this.tasksUrl + `/${taskId}`);
   }
 
-  dependencyCheck(taskId: string): Observable<boolean> { 
-    console.log(`Performing dependencycheck for task:${taskId}`);
+  private dependencyCheck(task: Task): Observable<boolean> { 
+    console.log(`Performing dependencycheck for task:${task._id}`);
     let observable = new Observable<boolean>(observer => {
-      this.getDependencyTasks(taskId).subscribe((res)=> {
+      this.getDependencyTasks(task._id).subscribe((res)=> {
         let dependencyTasks = res as Array<Task>;
         let open = true;                 
-        for(let task of dependencyTasks){
+        for(let dTask of dependencyTasks){
           if(open){            
-            if(task.status!='finished'){
+            if(dTask.status!='finished'){
               open = false;
-              console.log(`task:${task.title}:${task.status}`);
-              console.log('Still waiting on dependencies.');              
+              console.log(`Still waiting on dependency: ${dTask.title}`);              
             }
           }
         }
@@ -80,6 +90,8 @@ export class TaskService {
     });
     return observable;
   }
+
+  
 
   private deleteAssignments(taskId: string){
     this.assignmentService.getTaskAssignments(taskId)

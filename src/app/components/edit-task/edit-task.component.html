@@ -36,10 +36,10 @@
           id="statusInput" formControlName="status"          
           [(ngModel)]="this.selectedTask.status"
         >
-          <option *ngIf="waiting" value="waiting">Waiting</option>
-          <option *ngIf="!waiting" value="open">Open</option>
-          <option *ngIf="!waiting" value="in-progress">In progress</option>
-          <option *ngIf="!waiting" value="finished">Finished</option>
+          <option *ngIf="this.selectedTask.status == 'waiting'" value="waiting">Waiting</option>
+          <option *ngIf="this.selectedTask.status != 'waiting'" value="open">Open</option>
+          <option *ngIf="this.selectedTask.status != 'waiting'" value="in-progress">In progress</option>
+          <option *ngIf="this.selectedTask.status != 'waiting'" value="finished">Finished</option>
         </select>
     </div>
     <div formArrayName="assignments" class="form-group">

@@ -11,6 +11,7 @@ import { UserService } from 'src/app/services/user.service';
 import { User } from 'src/app/classes/user';
 import { DependencyService } from 'src/app/services/dependency.service';
 import { Dependency } from 'src/app/classes/dependency';
+import { forkJoin, Observable } from 'rxjs';
 
 
 @Component({
@@ -40,8 +41,6 @@ export class EditTaskComponent implements OnInit {
   otherTasks: Task[] = [];
   dependencies: Dependency[] = []; 
   dependencyTasks: Task[] = [];
-
-  waiting: boolean = false;
   
   constructor(
     private route: ActivatedRoute,
@@ -119,7 +118,6 @@ export class EditTaskComponent implements OnInit {
       this.dependencies = res as Array<Dependency>;   
       this.getDependencyTasks();   
       this.selectDependencies();
-      this.statusDependencyCheck();  
     })
   }
 
@@ -141,11 +139,17 @@ export class EditTaskComponent implements OnInit {
   }
 
   onSubmit(): void {     
+    
     this.submitAssignments(this.taskForm.value.assignments);    
-    this.submitDependencies(this.taskForm.value.dependencies);
-    this.taskService.putTask(this.selectedTask).subscribe(() => {
-      this.goBack();          
-    });       
+    
+    this.submitDependencies(this.taskForm.value.dependencies).subscribe(()=>{
+      
+      console.log('sanity confirmed');
+      this.taskService.putTask(this.selectedTask).subscribe(() => {
+        this.goBack();          
+      });
+    });
+           
   }
 
   onDelete(): void {
@@ -183,33 +187,42 @@ export class EditTaskComponent implements OnInit {
     }
   }
 
-  submitDependencies(formDependencyValues: Array<string>) {   
+  submitDependencies(formDependencyValues: Array<string>): Observable<string> {   
     let databaseAmount =  this.dependencies.length;
     let formAmount = formDependencyValues.length;
 
-    let existingIndices = this.range(0, databaseAmount - 1);
-    for(let i of existingIndices){
-      if(formDependencyValues[i] != this.dependencies[i].dependency_id){
-        let updatedDependency = {
-          _id: this.dependencies[i]._id,
-          dependency_id: formDependencyValues[i],
-          task_id: this.dependencies[i].task_id
-        } as Dependency;
-        this.dependencyService.putDependency(updatedDependency).subscribe();
+    let observable = new Observable<string>(observer=>{
+      let databaseCalls = [];
+      let existingIndices = this.range(0, databaseAmount - 1);
+      for(let i of existingIndices){
+        if(formDependencyValues[i] != this.dependencies[i].dependency_id){
+          let updatedDependency = {
+            _id: this.dependencies[i]._id,
+            dependency_id: formDependencyValues[i],
+            task_id: this.dependencies[i].task_id
+          } as Dependency;
+          databaseCalls.push(this.dependencyService.putDependency(updatedDependency));
+        }
       }
-    }
 
-    if(databaseAmount < formAmount){
-      let newIndices = this.range(databaseAmount, formAmount - 1);
-      for(let i of newIndices){
-        let newDependency = {
-          _id: '',
-          dependency_id: formDependencyValues[i],
-          task_id: this.id
-        } as Dependency;
-        this.dependencyService.postDependency(newDependency).subscribe();
+      if(databaseAmount < formAmount){
+        let newIndices = this.range(databaseAmount, formAmount - 1);
+        for(let i of newIndices){
+          let newDependency = {
+            _id: '',
+            dependency_id: formDependencyValues[i],
+            task_id: this.id
+          } as Dependency;
+          databaseCalls.push(this.dependencyService.postDependency(newDependency));
+        }
       }
-    }
+      forkJoin(databaseCalls).subscribe(()=>{
+        console.log('finished dependency upload');
+        
+        observer.next('finished');
+      });
+    });
+    return observable;
   }
 
   get formAssignments(){
@@ -236,7 +249,6 @@ export class EditTaskComponent implements OnInit {
 
   addDependency(): void {
     this.formDependencies.push(this.fb.control(''));
-    this.waiting = true;
     this.taskForm.patchValue({status: 'waiting'});
   }
 
@@ -246,7 +258,6 @@ export class EditTaskComponent implements OnInit {
       this.dependencyService.deleteDependency(this.dependencies[i]._id).subscribe((res)=>{
         this.dependencies.splice(i, 1);
         this.getDependencyTasks();
-        this.statusDependencyCheck();
       });
     }
   }
@@ -270,36 +281,5 @@ export class EditTaskComponent implements OnInit {
   logger(): void{
     console.log(this.taskForm.value);      
   }
-
-  statusDependencyCheck(){
-    if(this.dependencies.length > 0){
-      this.taskService.dependencyCheck(this.id)
-      .subscribe((open) => {
-        console.log('Check performed: open=' + open);
-        
-        if(!open){          
-          this.waiting = true;
-          this.taskForm.patchValue({status: 'waiting'});
-        }  
-        else{
-          this.waiting = false;
-          if(this.taskForm.value.status == 'waiting'){     
-            console.log('Changing status to open'); 
-            this.taskForm.patchValue({status: 'open'});
-            this.taskService.putTask(this.selectedTask).subscribe();
-          }
-        }         
-      });  
-    }
-    else{
-      console.log('this.dependencies is empty.');    
-      this.waiting = false;
-      if(this.taskForm.value.status == 'waiting'){     
-        console.log('Changing status to open');                  
-        this.taskForm.patchValue({status: 'open'});
-        this.taskService.putTask(this.selectedTask).subscribe();
-      }
-    }
-  }   
    
 }
