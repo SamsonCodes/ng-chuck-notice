@@ -12,6 +12,7 @@ import { User } from 'src/app/classes/user';
 import { DependencyService } from 'src/app/services/dependency.service';
 import { Dependency } from 'src/app/classes/dependency';
 import { forkJoin, Observable } from 'rxjs';
+import { defaultIfEmpty } from 'rxjs/operators';
 
 
 @Component({
@@ -138,17 +139,25 @@ export class EditTaskComponent implements OnInit {
     }
   }
 
-  onSubmit(): void {     
-    
-    this.submitAssignments(this.taskForm.value.assignments);    
-    
-    this.submitDependencies(this.taskForm.value.dependencies).subscribe(()=>{
-      
-      console.log('sanity confirmed');
+  onSubmit(): void {   
+    this.submitAssignments(this.taskForm.value.assignments);  
+    if(this.taskForm.value.dependencies.length > 0){
+      this.submitDependencies(this.taskForm.value.dependencies)
+        .pipe(
+          defaultIfEmpty(),
+        ).subscribe((res)=>{               
+          console.log('dependencies submitted:');
+          console.log(res); 
+          this.taskService.putTask(this.selectedTask).subscribe(() => {
+            this.goBack();          
+        });
+      });
+    }  
+    else{
       this.taskService.putTask(this.selectedTask).subscribe(() => {
         this.goBack();          
       });
-    });
+    }
            
   }
 
@@ -187,42 +196,42 @@ export class EditTaskComponent implements OnInit {
     }
   }
 
-  submitDependencies(formDependencyValues: Array<string>): Observable<string> {   
+  submitDependencies(formDependencyValues: Array<string>): Observable<Object> {
+    console.log('submitting dependencies: ');
+    console.log(formDependencyValues);
+    
+    
     let databaseAmount =  this.dependencies.length;
     let formAmount = formDependencyValues.length;
-
-    let observable = new Observable<string>(observer=>{
-      let databaseCalls = [];
-      let existingIndices = this.range(0, databaseAmount - 1);
-      for(let i of existingIndices){
-        if(formDependencyValues[i] != this.dependencies[i].dependency_id){
-          let updatedDependency = {
-            _id: this.dependencies[i]._id,
-            dependency_id: formDependencyValues[i],
-            task_id: this.dependencies[i].task_id
-          } as Dependency;
-          databaseCalls.push(this.dependencyService.putDependency(updatedDependency));
-        }
+    
+    let databaseCalls = [];
+    let existingIndices = this.range(0, databaseAmount - 1);
+    console.log(existingIndices);
+    
+    for(let i of existingIndices){
+      if(formDependencyValues[i] != this.dependencies[i].dependency_id){
+        let updatedDependency = {
+          _id: this.dependencies[i]._id,
+          dependency_id: formDependencyValues[i],
+          task_id: this.dependencies[i].task_id
+        } as Dependency;
+        databaseCalls.push(this.dependencyService.putDependency(updatedDependency));
       }
+    }
 
-      if(databaseAmount < formAmount){
-        let newIndices = this.range(databaseAmount, formAmount - 1);
-        for(let i of newIndices){
-          let newDependency = {
-            _id: '',
-            dependency_id: formDependencyValues[i],
-            task_id: this.id
-          } as Dependency;
-          databaseCalls.push(this.dependencyService.postDependency(newDependency));
-        }
+    if(databaseAmount < formAmount){
+      let newIndices = this.range(databaseAmount, formAmount - 1);
+      for(let i of newIndices){
+        let newDependency = {
+          _id: '',
+          dependency_id: formDependencyValues[i],
+          task_id: this.id
+        } as Dependency;
+        databaseCalls.push(this.dependencyService.postDependency(newDependency));
       }
-      forkJoin(databaseCalls).subscribe(()=>{
-        console.log('finished dependency upload');
-        
-        observer.next('finished');
-      });
-    });
-    return observable;
+    }
+    console.log(databaseCalls);    
+    return forkJoin(databaseCalls);
   }
 
   get formAssignments(){

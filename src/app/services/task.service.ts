@@ -35,13 +35,23 @@ export class TaskService {
   putTask(task: Task){
     let observable = new Observable(observer=>{
       this.dependencyCheck(task).subscribe(open=>{
+        console.log('dependency check finished');
+        
         if(!open){
-          task.status = 'waiting'
+          task.status = 'waiting'; 
         }
+        else{
+          if (task.status == 'waiting'){
+            task.status = 'open';
+          }
+        }        
+        console.log(task);         
         if(task.status == 'finished'){
           console.log('Todo: updating status of tasks depending on this finished task');
         }
-        observer.next(this.http.put(this.tasksUrl + `/${task._id}`, task));
+        this.http.put(this.tasksUrl + `/${task._id}`, task).subscribe((res)=>{          
+          observer.next(res); 
+        });
       }) 
     })
     return observable;
@@ -58,6 +68,8 @@ export class TaskService {
     console.log(`Performing dependencycheck for task:${task._id}`);
     let observable = new Observable<boolean>(observer => {
       this.getDependencyTasks(task._id).subscribe((res)=> {
+        console.log('dependency tasks loaded');
+        
         let dependencyTasks = res as Array<Task>;
         let open = true;                 
         for(let dTask of dependencyTasks){
@@ -78,14 +90,23 @@ export class TaskService {
     let observable = new Observable(observer=>{
       this.dependencyService.getTaskDependencies(taskId).subscribe((results)=>{
         let dependencies = results as Array<Dependency>;
-        let taskCalls: Observable<Task>[] = [];
-        dependencies.forEach((dependency)=>{
-          const taskCall = this.getTask(dependency.dependency_id) as Observable<Task>;
-          taskCalls.push(taskCall);
-        })
-        forkJoin(taskCalls).subscribe((res)=>{
-          observer.next(res);
-        })        
+        if(dependencies.length > 0){
+          let taskCalls: Observable<Task>[] = [];
+          dependencies.forEach((dependency)=>{
+            const taskCall = this.getTask(dependency.dependency_id) as Observable<Task>;
+            taskCalls.push(taskCall);
+          })
+          
+          forkJoin(taskCalls).subscribe((res)=>{
+            console.log('dependencies loaded');
+            
+            observer.next(res);
+          })       
+        }
+        else{
+          console.log('no dependencies');
+          observer.next([]);
+        }         
       })
     });
     return observable;
