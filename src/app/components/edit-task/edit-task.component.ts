@@ -40,6 +40,8 @@ export class EditTaskComponent implements OnInit {
   otherTasks: Task[] = [];
   dependencies: Dependency[] = []; 
   dependencyTasks: Task[] = [];
+
+  waiting: boolean = false;
   
   constructor(
     private route: ActivatedRoute,
@@ -57,7 +59,8 @@ export class EditTaskComponent implements OnInit {
     this.getAllUsers();
     this.getAllTasks();
     this.getAssignments();
-    this.getDependencies();
+    this.getDependencies();  
+    this.statusDependencyCheck();  
   }
 
   getId(): void {
@@ -139,13 +142,10 @@ export class EditTaskComponent implements OnInit {
 
   onSubmit(): void {     
     this.submitAssignments(this.taskForm.value.assignments);    
-    this.submitDependencies(this.taskForm.value.dependencies).then(() => {
-        this.taskService.putTask(this.selectedTask).subscribe(() => {
-          this.taskService.dependencyCheck(this.id);
-          this.goBack();          
-        });
-      }     
-    );  
+    this.submitDependencies(this.taskForm.value.dependencies);
+    this.taskService.putTask(this.selectedTask).subscribe(() => {
+      this.goBack();          
+    });       
   }
 
   onDelete(): void {
@@ -166,7 +166,7 @@ export class EditTaskComponent implements OnInit {
           user_id: formAssignmentValues[i],
           task_id: this.assignments[i].task_id
         } as Assignment;
-        this.assignmentService.putAssignment(updatedAssignment).subscribe((res)=>{});
+        this.assignmentService.putAssignment(updatedAssignment).subscribe();
       }
     }
 
@@ -178,7 +178,7 @@ export class EditTaskComponent implements OnInit {
           user_id: formAssignmentValues[i],
           task_id: this.id
         } as Assignment;
-        this.assignmentService.postAssignment(newAssignment).subscribe((res)=>{});
+        this.assignmentService.postAssignment(newAssignment).subscribe();
       }
     }
   }
@@ -188,7 +188,6 @@ export class EditTaskComponent implements OnInit {
     let formAmount = formDependencyValues.length;
 
     let existingIndices = this.range(0, databaseAmount - 1);
-    let serviceCalls: any[] = [];
     for(let i of existingIndices){
       if(formDependencyValues[i] != this.dependencies[i].dependency_id){
         let updatedDependency = {
@@ -196,7 +195,7 @@ export class EditTaskComponent implements OnInit {
           dependency_id: formDependencyValues[i],
           task_id: this.dependencies[i].task_id
         } as Dependency;
-        serviceCalls.push(this.dependencyService.putDependency(updatedDependency).toPromise());;
+        this.dependencyService.putDependency(updatedDependency).subscribe();
       }
     }
 
@@ -208,10 +207,9 @@ export class EditTaskComponent implements OnInit {
           dependency_id: formDependencyValues[i],
           task_id: this.id
         } as Dependency;
-        serviceCalls.push(this.dependencyService.postDependency(newDependency).toPromise());
+        this.dependencyService.postDependency(newDependency).subscribe();
       }
     }
-    return Promise.all(serviceCalls);
   }
 
   get formAssignments(){
@@ -246,6 +244,7 @@ export class EditTaskComponent implements OnInit {
       this.dependencyService.deleteDependency(this.dependencies[i]._id).subscribe((res)=>{
         this.dependencies.splice(i, 1);
         this.getDependencyTasks();
+        this.statusDependencyCheck();
       });
     }
   }
@@ -267,6 +266,23 @@ export class EditTaskComponent implements OnInit {
   }
 
   logger(): void{
-    // console.log(this.taskForm.value);    
+    console.log(this.taskForm.value);      
+  }
+
+  statusDependencyCheck(){
+    this.taskService.dependencyCheck(this.id)
+      .subscribe((open) => {
+        if(!open){
+          this.taskForm.patchValue({status: 'waiting'});
+          this.waiting = true;
+        }  
+        else{
+          if(this.taskForm.value.status == 'waiting'){
+            this.taskForm.patchValue({status: 'open'});
+            this.waiting = false;
+          }
+        }  
+        console.log('waiting:' + this.waiting);            
+      });  
   }
 }

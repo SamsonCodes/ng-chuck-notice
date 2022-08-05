@@ -43,18 +43,11 @@ export class TaskService {
     return this.http.delete(this.tasksUrl + `/${taskId}`);
   }
 
-  dependencyCheck(taskId: string): void { 
-    console.log(`Performing dependencycheck for task:${taskId}`);    
-    this.dependencyService.getTaskDependencies(taskId).subscribe((results)=>{
-      let dependencies = results as Array<Dependency>;
-      console.log(dependencies);      
-      let taskCalls: Observable<Task>[] = [];
-      dependencies.forEach((dependency)=>{
-        const taskCall = this.getTask(dependency.dependency_id) as Observable<Task>;
-        taskCalls.push(taskCall);
-      })
-      console.log(taskCalls.length + ' taskCalls'); 
-      forkJoin(taskCalls).subscribe((dependencyTasks: Task[])=>{
+  dependencyCheck(taskId: string): Observable<boolean> { 
+    console.log(`Performing dependencycheck for task:${taskId}`);
+    let observable = new Observable<boolean>(observer => {
+      this.getDependencyTasks(taskId).subscribe((res)=> {
+        let dependencyTasks = res as Array<Task>;
         let open = true;                 
         for(let task of dependencyTasks){
           if(open){            
@@ -64,19 +57,28 @@ export class TaskService {
               console.log('Still waiting on dependencies.');              
             }
           }
-          this.getTask(taskId).subscribe((res)=>{
-            let selectedTask = res as Task;
-            if (!open) {
-              selectedTask.status = 'waiting';
-            }
-            else if(selectedTask.status == 'waiting'){
-              selectedTask.status = 'open';
-            }
-            this.putTask(selectedTask).subscribe();
-          })          
         }
+        observer.next(open);
+      })    
+    })   
+    return observable;
+  }
+
+  private getDependencyTasks(taskId: string) {
+    let observable = new Observable(observer=>{
+      this.dependencyService.getTaskDependencies(taskId).subscribe((results)=>{
+        let dependencies = results as Array<Dependency>;
+        let taskCalls: Observable<Task>[] = [];
+        dependencies.forEach((dependency)=>{
+          const taskCall = this.getTask(dependency.dependency_id) as Observable<Task>;
+          taskCalls.push(taskCall);
+        })
+        forkJoin(taskCalls).subscribe((res)=>{
+          observer.next(res);
+        })        
       })
-    })
+    });
+    return observable;
   }
 
   private deleteAssignments(taskId: string){
