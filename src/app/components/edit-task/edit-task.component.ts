@@ -141,30 +141,8 @@ export class EditTaskComponent implements OnInit {
     this.submitAssignments(this.taskForm.value.assignments);    
     this.submitDependencies(this.taskForm.value.dependencies).then(() => {
         this.taskService.putTask(this.selectedTask).subscribe(() => {
-          this.taskService.getDependencyTasks(this.id).subscribe((dependencyTasks: Task[])=>{
-            let open = true;                 
-            for(let task of dependencyTasks){
-              if(open){            
-                if(task.status!='finished'){
-                  open = false;
-                  console.log(`task:${task.title}:${task.status}`);
-                  console.log('Still waiting on dependencies.');              
-                }
-              }
-              this.taskService.getTask(this.id).subscribe((res)=>{
-                let selectedTask = res as Task;
-                if (!open) {
-                  selectedTask.status = 'waiting';
-                }
-                else if(selectedTask.status == 'waiting'){
-                  selectedTask.status = 'open';
-                }
-                this.taskService.putTask(selectedTask).subscribe((res) => {                  
-                  this.goBack();
-                });
-              })          
-            }
-          })
+          this.taskService.dependencyCheck(this.id);
+          this.goBack();          
         });
       }     
     );  

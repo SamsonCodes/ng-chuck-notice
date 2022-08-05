@@ -6,6 +6,7 @@ import { AssignmentService } from './assignment.service';
 import { Assignment } from '../classes/assignment';
 import { DependencyService } from './dependency.service';
 import { Dependency } from '../classes/dependency';
+import { forkJoin, Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -42,16 +43,39 @@ export class TaskService {
     return this.http.delete(this.tasksUrl + `/${taskId}`);
   }
 
-  getDependencyTasks(taskId: string): any {
-    console.log(`Getting dependency for task:${taskId}`);    
+  dependencyCheck(taskId: string): void { 
+    console.log(`Performing dependencycheck for task:${taskId}`);    
     this.dependencyService.getTaskDependencies(taskId).subscribe((results)=>{
       let dependencies = results as Array<Dependency>;
-      let taskCalls: any[] = [];
+      console.log(dependencies);      
+      let taskCalls: Observable<Task>[] = [];
       dependencies.forEach((dependency)=>{
-        const taskCall = this.getTask(dependency.dependency_id).toPromise();
+        const taskCall = this.getTask(dependency.dependency_id) as Observable<Task>;
         taskCalls.push(taskCall);
       })
-      return Promise.all(taskCalls);
+      console.log(taskCalls.length + ' taskCalls'); 
+      forkJoin(taskCalls).subscribe((dependencyTasks: Task[])=>{
+        let open = true;                 
+        for(let task of dependencyTasks){
+          if(open){            
+            if(task.status!='finished'){
+              open = false;
+              console.log(`task:${task.title}:${task.status}`);
+              console.log('Still waiting on dependencies.');              
+            }
+          }
+          this.getTask(taskId).subscribe((res)=>{
+            let selectedTask = res as Task;
+            if (!open) {
+              selectedTask.status = 'waiting';
+            }
+            else if(selectedTask.status == 'waiting'){
+              selectedTask.status = 'open';
+            }
+            this.putTask(selectedTask).subscribe();
+          })          
+        }
+      })
     })
   }
 
