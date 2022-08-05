@@ -47,11 +47,18 @@ export class TaskService {
         }        
         console.log(task);         
         if(task.status == 'finished'){
-          console.log('Todo: updating status of tasks depending on this finished task');
+          console.log('Updating status of tasks depending on this finished task');
+          this.dependencyOnUpdate(task).subscribe((res)=>{
+            this.http.put(this.tasksUrl + `/${task._id}`, task).subscribe((res)=>{          
+              observer.next(res); 
+            });
+          });
         }
-        this.http.put(this.tasksUrl + `/${task._id}`, task).subscribe((res)=>{          
-          observer.next(res); 
-        });
+        else {
+          this.http.put(this.tasksUrl + `/${task._id}`, task).subscribe((res)=>{          
+            observer.next(res); 
+          });
+        }        
       }) 
     })
     return observable;
@@ -86,6 +93,42 @@ export class TaskService {
     return observable;
   }
 
+  private dependencyOnUpdate(task: Task) { 
+    console.log(`Performing dependencyOnUpdate for task:${task._id}`);
+    let observable = new Observable<boolean>(observer => {
+      this.getDependantTasks(task._id).subscribe((res)=> {        
+        let dependantTasks = res as Array<Task>;        
+        console.log(`${dependantTasks.length} dependant tasks loaded`);
+        console.log(dependantTasks);
+        if(dependantTasks.length > 0){
+          let updates = [];
+          for(let dOnTask of dependantTasks){
+            if(dOnTask.status == 'waiting'){
+              dOnTask.status ='open';
+              updates.push(this.http.put(this.tasksUrl + `/${dOnTask._id}`, dOnTask));
+            }
+          }
+          if(updates.length > 0){
+            forkJoin(updates).subscribe((res)=>{
+              console.log('Updates completed.');
+              console.log(res);
+              observer.next();
+            });
+          } 
+          else {
+            console.log('No updates required.');            
+            observer.next();
+          }          
+        }
+        else{
+          console.log('No dependant tasks loaded so skipping.');          
+          observer.next();
+        }
+      })    
+    })   
+    return observable;
+  }
+
   private getDependencyTasks(taskId: string) {
     let observable = new Observable(observer=>{
       this.dependencyService.getTaskDependencies(taskId).subscribe((results)=>{
@@ -112,7 +155,34 @@ export class TaskService {
     return observable;
   }
 
-  
+  private getDependantTasks(taskId: string) {
+    let observable = new Observable(observer=>{
+      this.dependencyService.getDependenciesOn(taskId).subscribe((results)=>{
+        let dependenciesOn = results as Array<Dependency>;
+        console.log(`${dependenciesOn.length} dependenciesOn found:`)
+        console.log(dependenciesOn);
+        
+        if(dependenciesOn.length > 0){
+          let taskCalls: Observable<Task>[] = [];
+          dependenciesOn.forEach((dependency)=>{
+            const taskCall = this.getTask(dependency.task_id) as Observable<Task>;
+            taskCalls.push(taskCall);
+          })
+          
+          forkJoin(taskCalls).subscribe((res)=>{
+            console.log('dependant tasks loaded');
+            
+            observer.next(res);
+          })       
+        }
+        else{
+          console.log('no dependant tasks');
+          observer.next([]);
+        }         
+      })
+    });
+    return observable;
+  }
 
   private deleteAssignments(taskId: string){
     this.assignmentService.getTaskAssignments(taskId)
