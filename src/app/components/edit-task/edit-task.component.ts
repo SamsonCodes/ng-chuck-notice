@@ -59,8 +59,7 @@ export class EditTaskComponent implements OnInit {
     this.getAllUsers();
     this.getAllTasks();
     this.getAssignments();
-    this.getDependencies();  
-    this.statusDependencyCheck();  
+    this.getDependencies(); 
   }
 
   getId(): void {
@@ -120,6 +119,7 @@ export class EditTaskComponent implements OnInit {
       this.dependencies = res as Array<Dependency>;   
       this.getDependencyTasks();   
       this.selectDependencies();
+      this.statusDependencyCheck();  
     })
   }
 
@@ -183,7 +183,7 @@ export class EditTaskComponent implements OnInit {
     }
   }
 
-  submitDependencies(formDependencyValues: Array<string>): any {   
+  submitDependencies(formDependencyValues: Array<string>) {   
     let databaseAmount =  this.dependencies.length;
     let formAmount = formDependencyValues.length;
 
@@ -236,6 +236,8 @@ export class EditTaskComponent implements OnInit {
 
   addDependency(): void {
     this.formDependencies.push(this.fb.control(''));
+    this.waiting = true;
+    this.taskForm.patchValue({status: 'waiting'});
   }
 
   removeDependency(i: number): void {
@@ -270,19 +272,34 @@ export class EditTaskComponent implements OnInit {
   }
 
   statusDependencyCheck(){
-    this.taskService.dependencyCheck(this.id)
+    if(this.dependencies.length > 0){
+      this.taskService.dependencyCheck(this.id)
       .subscribe((open) => {
-        if(!open){
-          this.taskForm.patchValue({status: 'waiting'});
+        console.log('Check performed: open=' + open);
+        
+        if(!open){          
           this.waiting = true;
+          this.taskForm.patchValue({status: 'waiting'});
         }  
         else{
-          if(this.taskForm.value.status == 'waiting'){
+          this.waiting = false;
+          if(this.taskForm.value.status == 'waiting'){     
+            console.log('Changing status to open'); 
             this.taskForm.patchValue({status: 'open'});
-            this.waiting = false;
+            this.taskService.putTask(this.selectedTask).subscribe();
           }
-        }  
-        console.log('waiting:' + this.waiting);            
+        }         
       });  
-  }
+    }
+    else{
+      console.log('this.dependencies is empty.');    
+      this.waiting = false;
+      if(this.taskForm.value.status == 'waiting'){     
+        console.log('Changing status to open');                  
+        this.taskForm.patchValue({status: 'open'});
+        this.taskService.putTask(this.selectedTask).subscribe();
+      }
+    }
+  }   
+   
 }
