@@ -48,7 +48,7 @@ export class TaskService {
         console.log(task);         
         if(task.status == 'finished'){
           console.log('Updating status of tasks depending on this finished task');
-          this.dependencyOnUpdate(task).subscribe((res)=>{
+          this.updateDependantTasks(task).subscribe(()=>{
             this.http.put(this.tasksUrl + `/${task._id}`, task).subscribe((res)=>{          
               observer.next(res); 
             });
@@ -83,7 +83,7 @@ export class TaskService {
           if(open){            
             if(dTask.status!='finished'){
               open = false;
-              console.log(`Still waiting on dependency: ${dTask.title}`);              
+              console.log(`${task.title} still waiting on dependency: ${dTask.title}`);              
             }
           }
         }
@@ -93,33 +93,32 @@ export class TaskService {
     return observable;
   }
 
-  private dependencyOnUpdate(task: Task) { 
-    console.log(`Performing dependencyOnUpdate for task:${task._id}`);
+  private updateDependantTasks(task: Task) { 
+    console.log(`Performing updateDependantTasks for task:${task._id}`);
     let observable = new Observable<boolean>(observer => {
       this.getDependantTasks(task._id).subscribe((res)=> {        
         let dependantTasks = res as Array<Task>;        
         console.log(`${dependantTasks.length} dependant tasks loaded`);
         console.log(dependantTasks);
         if(dependantTasks.length > 0){
-          let updates = [];
-          for(let dOnTask of dependantTasks){
-            if(dOnTask.status == 'waiting'){
-              dOnTask.status ='open';
-              updates.push(this.http.put(this.tasksUrl + `/${dOnTask._id}`, dOnTask));
+          for(let dTask of dependantTasks){
+            if(dTask.status == 'waiting'){
+              this.dependencyCheck(dTask).subscribe((open)=>{
+                if(open){
+                  dTask.status = 'open';
+                  this.http.put(this.tasksUrl + `/${dTask._id}`, dTask).subscribe(()=>{
+                    console.log(`${dTask.title} opened.`);
+                  });
+                }
+                else{
+                  console.log(`${dTask.title} still awaiting other dependencies.`);
+                }
+              });
             }
+            console.log(`${dTask.title} already open.`);            
           }
-          if(updates.length > 0){
-            forkJoin(updates).subscribe((res)=>{
-              console.log('Updates completed.');
-              console.log(res);
-              observer.next();
-            });
-          } 
-          else {
-            console.log('No updates required.');            
-            observer.next();
-          }          
-        }
+          observer.next();
+        } 
         else{
           console.log('No dependant tasks loaded so skipping.');          
           observer.next();
