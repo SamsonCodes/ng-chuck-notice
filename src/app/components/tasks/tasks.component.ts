@@ -69,4 +69,10 @@ export class TasksComponent implements OnInit {
       this.refreshTaskList();
     });
   }  
+
+  performTest(){
+    this.taskService.observableTest().subscribe((res)=>{
+      console.log(res);      
+    });
+  }
 }
