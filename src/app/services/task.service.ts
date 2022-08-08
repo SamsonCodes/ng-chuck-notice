@@ -181,43 +181,32 @@ export class TaskService {
     return observable;
   }
 
-  private updateDependantTasks(task: Task) {     
+  private updateDependantTasks(task: Task): Observable<void> {     
     console.log(`Performing updateDependantTasks for task:${task._id}`);
     //get dependant tasks
     //perform dependency check for each dependant task that has status waiting
     //for each dependant task: if dependency check yields true value for open, update the dependant task status to open    
-    let observable = new Observable<boolean>(observer => {
-      this.getDependantTasks(task._id).subscribe((res)=> {        
-        let dependantTasks = res as Array<Task>;        
-        console.log(`${dependantTasks.length} dependant tasks loaded`);
-        console.log(dependantTasks);
-        if(dependantTasks.length > 0){
-          let dependencyUpdates = []
-          for(let dTask of dependantTasks){
+    let observable = new Observable (observer => {
+      this.getDependantTasks(task._id).pipe(
+        switchMap((dependantTasks: Task[]) => {
+          let checkAndUpdateCalls: Observable<boolean>[] = [];
+          dependantTasks.forEach(dTask => {
             if(dTask.status == 'waiting'){
-              console.log(`scheduling dependency check and update for ${dTask.title}`);              
-              dependencyUpdates.push(this.dependencyCheckAndUpdate(dTask) as Observable<boolean>);
+              let checkAndUpdateCall = this.dependencyCheckAndUpdate(dTask);
+              checkAndUpdateCalls.push(checkAndUpdateCall);
             }
-            else{
-              console.log(`${dTask.title} already open.`);
-            }                        
-          }
-          console.log(dependencyUpdates);          
-          forkJoin(dependencyUpdates).subscribe(()=>{            
-            console.log(`All dependency checks and updates are completed.`);            
-            observer.complete();
-          });          
-        } 
-        else{
-          console.log('No dependant tasks loaded so skipping.');          
-          observer.complete();
-        }
-      })    
-    })   
+          })
+          return combineLatest(checkAndUpdateCalls);
+        })
+      ).subscribe((results)=>{
+          console.log(results);
+          observer.next();
+      });
+    }) as Observable<void>;
     return observable;
   }   
 
-  private getDependantTasks(taskId: string) {
+  private getDependantTasks(taskId: string): Observable<Task[]> {
     let observable = new Observable(observer=>{
       this.dependencyService.getDependenciesOn(taskId).subscribe((results)=>{
         let dependenciesOn = results as Array<Dependency>;
@@ -241,7 +230,7 @@ export class TaskService {
           observer.next([]);
         }         
       })
-    });
+    }) as Observable<Task[]>;
     return observable;
   }
 
@@ -262,17 +251,17 @@ export class TaskService {
         if(task.status =='waiting' && open){
           console.log(`opening ${task.title}`);
           task.status = 'open';          
-          this.http.put(this.tasksUrl + `/${task._id}`, task).subscribe(()=>{
+          this.http.put(this.tasksUrl + `/${task._id}`, task).subscribe((res)=>{
             console.log(`dependencyCheckAndUpdate for ${task.title} finished`);
-            observer.complete();
+            observer.next(open);
           });
         }
         else {
           console.log(`dependencyCheckAndUpdate for ${task.title} finished`);
-          observer.complete();
+          observer.next(open);
         }        
       })    
-    })   
+    }) as Observable<boolean>;
     return observable;
   }
 

@@ -198,8 +198,7 @@ export class EditTaskComponent implements OnInit {
 
   submitDependencies(formDependencyValues: Array<string>): Observable<Object> {
     console.log('submitting dependencies: ');
-    console.log(formDependencyValues);
-    
+    console.log(formDependencyValues);    
     
     let databaseAmount =  this.dependencies.length;
     let formAmount = formDependencyValues.length;
