@@ -6,7 +6,7 @@ import { AssignmentService } from './assignment.service';
 import { Assignment } from '../classes/assignment';
 import { DependencyService } from './dependency.service';
 import { Dependency } from '../classes/dependency';
-import { forkJoin, Observable } from 'rxjs';
+import { forkJoin, Observable, combineLatest } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 
 @Injectable({
@@ -22,15 +22,26 @@ export class TaskService {
     ) { }
 
 
-  observableTest(){
+  observableTest(){    
     let observable = new Observable(subscriber=>{
       this.fetchProduct('A').pipe(
         switchMap((product) => this.fetchSimilarProducts(product)),
-        switchMap((products) => this.deleteProducts(products))
-      ).subscribe(deletedProducts=>{
-        subscriber.next(deletedProducts);
+        switchMap((products: string[]) => {
+          console.log('deleting products:');
+          console.log(products);        
+          
+          let deleteCalls: Observable<string>[] = [];
+          products.forEach(product=>{
+            let deleteCall: Observable<string> = this.deleteProduct(product); 
+            deleteCalls.push(deleteCall);
+          })
+          return combineLatest(deleteCalls);
+        })
+      ).subscribe((deleteResults: string[])=>{
+        console.log('All deletecalls returned.');      
+        subscriber.next(deleteResults);
       })
-    })
+    }) as Observable<string[]>;
     return observable;
   }
 
@@ -73,14 +84,14 @@ export class TaskService {
     return observable;
   }
 
-  deleteProducts(products: string[]){
+  deleteProduct(product: string){
     let observable = new Observable(subscriber=>{
-      console.log('Deleting ', products.length, ' products');
+      console.log('deleting ' + product);
       setTimeout(()=>{
-        console.log('products successfully deleted');
-        subscriber.next(products);        
+        console.log(product + ' deleted.');
+        subscriber.next(product);
       }, 100);
-    }) as Observable<string[]>;
+    }) as Observable<string>
     return observable;
   }
 

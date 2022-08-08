@@ -71,8 +71,8 @@ export class TasksComponent implements OnInit {
   }  
 
   performTest(){
-    this.taskService.observableTest().subscribe((res)=>{
-      console.log(res);      
-    });
+    this.taskService.observableTest().subscribe((deleteResults)=>{
+      console.log(deleteResults);
+    })
   }
 }
