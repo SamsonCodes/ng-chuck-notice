@@ -1,13 +1,13 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { forkJoin, Observable, combineLatest } from 'rxjs';
+import { switchMap } from 'rxjs/operators';
 
 import { Task } from '../classes/task';
 import { AssignmentService } from './assignment.service';
 import { Assignment } from '../classes/assignment';
 import { DependencyService } from './dependency.service';
 import { Dependency } from '../classes/dependency';
-import { forkJoin, Observable, combineLatest } from 'rxjs';
-import { switchMap } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'

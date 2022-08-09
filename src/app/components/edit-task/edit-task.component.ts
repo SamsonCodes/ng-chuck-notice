@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { FormArray, FormBuilder } from '@angular/forms';
 import { ActivatedRoute, Params } from '@angular/router';
 import { Location } from '@angular/common';
+import { forkJoin, Observable } from 'rxjs';
+import { defaultIfEmpty } from 'rxjs/operators';
 
 import { TaskService } from '../../services/task.service';
 import { Task } from '../../classes/task';
@@ -11,8 +13,6 @@ import { UserService } from 'src/app/services/user.service';
 import { User } from 'src/app/classes/user';
 import { DependencyService } from 'src/app/services/dependency.service';
 import { Dependency } from 'src/app/classes/dependency';
-import { forkJoin, Observable } from 'rxjs';
-import { defaultIfEmpty } from 'rxjs/operators';
 
 
 @Component({
