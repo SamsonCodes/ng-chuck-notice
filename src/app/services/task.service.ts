@@ -166,10 +166,23 @@ export class TaskService {
   }
   
   deleteTask(taskId: string){
-    this.deleteAssignments(taskId);
-    this.deleteDependenciesOf(taskId);
-    this.deleteDependenciesOn(taskId);
-    return this.http.delete(this.tasksUrl + `/${taskId}`);
+    let observable = new Observable<void>(subscriber=>{
+      this.getTask(taskId).subscribe((taskData)=>{
+        let task = taskData as Task;
+        task.status='finished'; //First save the task as finished so the dependant tasks can be updated before task deletion.
+        this.http.put(this.tasksUrl + `/${taskId}`, task).subscribe(()=>{
+          this.updateDependantTasks(taskId).subscribe(()=>{
+            this.deleteAssignments(taskId);
+            this.deleteDependenciesOf(taskId);
+            this.deleteDependenciesOn(taskId);
+            this.http.delete(this.tasksUrl + `/${taskId}`).subscribe(()=>{
+              subscriber.next();
+            });
+          })
+        })
+      });      
+    });
+    return observable;    
   }
 
   private deleteAssignments(taskId: string){

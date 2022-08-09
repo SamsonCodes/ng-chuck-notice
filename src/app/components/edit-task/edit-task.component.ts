@@ -160,7 +160,7 @@ export class EditTaskComponent implements OnInit {
   }
 
   onDelete(): void {
-    this.taskService.deleteTask(this.id).subscribe((res)=>{
+    this.taskService.deleteTask(this.id).subscribe(()=>{
       this.goBack();
     })   
   }

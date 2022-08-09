@@ -65,7 +65,7 @@ export class TasksComponent implements OnInit {
   }
 
   onDelete(taskId: string){
-    this.taskService.deleteTask(taskId).subscribe((res) => {
+    this.taskService.deleteTask(taskId).subscribe(() => {
       this.refreshTaskList();
     });
   }  
