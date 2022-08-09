@@ -1,5 +1,5 @@
 <h1>Add Task</h1>
-<form [formGroup]="taskForm" (ngSubmit)="onSubmit()">
+<form [formGroup]="taskForm" (ngSubmit)="onSubmit()" (change)="logger()">
     <div class="form-group">
         <label for="titleInput">Title</label>
         <input 
@@ -28,16 +28,45 @@
             [(ngModel)]="this.newTask.deadline"
         >
     </div>
-    <!-- <div class="form-group">
-        <label for="deadlineInput">Deadline</label>
-        <input 
-            required
-            minlength="3"
-            type="text" class="form-control"
-            id="deadlineInput" formControlName="deadline"
+    <div class="form-group">
+        <label for="statusInput">Status</label>
+        <select 
+          required
+          class="form-control"
+          id="statusInput" formControlName="status"          
+          [(ngModel)]="this.newTask.status"
         >
-    </div> -->
-    <button *ngIf="taskForm.valid" class="btn btn-lg btn-primary btn-block" type="submit">Add Task</button>        
+          <option *ngIf="this.newTask.status == 'waiting'" value="waiting">Waiting</option>
+          <option *ngIf="this.newTask.status != 'waiting'" value="open">Open</option>
+        </select>
+    </div>
+    <div formArrayName="assignments" class="form-group">
+        <h2>Assignments</h2>   
+        <div *ngFor="let assignment of formAssignments.controls; let i=index">
+            <!-- The repeated assignment template -->
+            <select id="assignment-{{ i }}" type="text" [formControlName]="i">
+                <option *ngFor="let user of this.allUsers" value="{{user._id}}">{{user.name}}</option>
+            </select>   
+            <span (click)="removeAssignment(i)">
+                <i class="material-icons">delete</i>
+            </span>       
+        </div>
+        <button type="button" (click)="addAssignment()">+ Add</button>
+    </div><div formArrayName="dependencies" class="form-group">
+        <h2>Dependencies</h2>   
+        <div *ngFor="let dependency of formDependencies.controls; let i=index">
+            <!-- The repeated dependency template -->
+            <select id="dependency-{{ i }}" type="text" [formControlName]="i">
+                <option *ngFor="let task of this.otherTasks" value="{{task._id}}">{{task.title}}</option>
+            </select>   
+            <span (click)="removeDependency(i)">
+                <i class="material-icons">delete</i>
+            </span>       
+        </div>
+        <button type="button" (click)="addDependency()">+ Add</button>
+    </div>
+    <button *ngIf="taskForm.valid" class="btn btn-lg btn-primary btn-block" type="submit">Add Task</button>    
+           
 </form>
 <table class=>
     <thead>
