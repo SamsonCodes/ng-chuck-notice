@@ -48,6 +48,18 @@ module.exports.getByTaskId = function(req, res){
         });
 }
 
+module.exports.getByUserId = function(req, res){
+    var userId = req.params.userId;
+    Assignment
+        .find({user_id: userId})
+        .exec(function (err, results) {
+            if (err) {
+                return handleError(err, res);
+            }
+            res.json(results);
+        });
+}
+
 //UPDATE
 module.exports.updateOne = function(req, res){ 
     var newAssignmentData = unpackAssignmentData(req);

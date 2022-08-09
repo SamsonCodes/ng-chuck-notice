@@ -44,7 +44,7 @@ export class UsersComponent implements OnInit {
   }
 
   onDelete(userId: string){
-    this.userService.deleteUser(userId).subscribe((res) => {
+    this.userService.deleteUser(userId).subscribe(() => {
       this.refreshUserList();
     });
   }

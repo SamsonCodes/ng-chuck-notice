@@ -19,6 +19,10 @@ export class AssignmentService {
     return this.http.get(this.assignmentsUrl +`/task/${taskId}`);
   }
 
+  getUserAssignments(userId: string){
+    return this.http.get(this.assignmentsUrl +`/user/${userId}`);
+  }
+
   putAssignment(assignment: Assignment){
     return this.http.put(this.assignmentsUrl +`/${assignment._id}`, assignment);
   }
