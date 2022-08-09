@@ -1,0 +1,8 @@
+TO DO:
+- Clean the dependency check code
+- Add the dependency check to the delete and post method
+- Merge the code with master
+- Delete assignments when deleting users
+- Add the dependency and assignment fields to the add task form
+
+- Authentication

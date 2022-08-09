@@ -145,9 +145,7 @@ export class EditTaskComponent implements OnInit {
       this.submitDependencies(this.taskForm.value.dependencies)
         .pipe(
           defaultIfEmpty(),
-        ).subscribe((res)=>{               
-          console.log('dependencies submitted:');
-          console.log(res); 
+        ).subscribe((res)=>{
           this.taskService.putTask(this.selectedTask).subscribe(() => {
             this.goBack();          
         });
@@ -174,11 +172,12 @@ export class EditTaskComponent implements OnInit {
     let existingIndices = this.range(0, databaseAmount - 1);
     for(let i of existingIndices){
       if(formAssignmentValues[i] != this.assignments[i].user_id){
-        let updatedAssignment = {
+        let updatedAssignment: Assignment = 
+        {
           _id: this.assignments[i]._id,
           user_id: formAssignmentValues[i],
           task_id: this.assignments[i].task_id
-        } as Assignment;
+        };
         this.assignmentService.putAssignment(updatedAssignment).subscribe();
       }
     }
@@ -186,34 +185,32 @@ export class EditTaskComponent implements OnInit {
     if(databaseAmount < formAmount){
       let newIndices = this.range(databaseAmount, formAmount - 1);
       for(let i of newIndices){
-        let newAssignment = {
+        let newAssignment: Assignment = 
+        {
           _id: '',
           user_id: formAssignmentValues[i],
           task_id: this.id
-        } as Assignment;
+        };
         this.assignmentService.postAssignment(newAssignment).subscribe();
       }
     }
   }
 
-  submitDependencies(formDependencyValues: Array<string>): Observable<Object> {
-    console.log('submitting dependencies: ');
-    console.log(formDependencyValues);    
-    
+  submitDependencies(formDependencyValues: Array<string>): Observable<Object[]> {
     let databaseAmount =  this.dependencies.length;
     let formAmount = formDependencyValues.length;
     
     let databaseCalls = [];
     let existingIndices = this.range(0, databaseAmount - 1);
-    console.log(existingIndices);
     
     for(let i of existingIndices){
       if(formDependencyValues[i] != this.dependencies[i].dependency_id){
-        let updatedDependency = {
+        let updatedDependency: Dependency = 
+        {
           _id: this.dependencies[i]._id,
           dependency_id: formDependencyValues[i],
           task_id: this.dependencies[i].task_id
-        } as Dependency;
+        };
         databaseCalls.push(this.dependencyService.putDependency(updatedDependency));
       }
     }
@@ -221,15 +218,15 @@ export class EditTaskComponent implements OnInit {
     if(databaseAmount < formAmount){
       let newIndices = this.range(databaseAmount, formAmount - 1);
       for(let i of newIndices){
-        let newDependency = {
+        let newDependency: Dependency = 
+        {
           _id: '',
           dependency_id: formDependencyValues[i],
           task_id: this.id
-        } as Dependency;
+        };
         databaseCalls.push(this.dependencyService.postDependency(newDependency));
       }
-    }
-    console.log(databaseCalls);    
+    }    
     return forkJoin(databaseCalls);
   }
 
@@ -284,10 +281,5 @@ export class EditTaskComponent implements OnInit {
       let range = tempRange.map((val)=>{return val + from})
       return range; //Example: range(1,3) returns [1,2,3]
     }    
-  }
-
-  logger(): void{
-    console.log(this.taskForm.value);      
-  }
-   
+  }   
 }

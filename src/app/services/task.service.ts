@@ -21,80 +21,6 @@ export class TaskService {
     private dependencyService: DependencyService
     ) { }
 
-
-  observableTest(){    
-    let observable = new Observable(subscriber=>{
-      this.fetchProduct('A').pipe(
-        switchMap((product) => this.fetchSimilarProducts(product)),
-        switchMap((products: string[]) => {
-          console.log('deleting products:');
-          console.log(products);        
-          
-          let deleteCalls: Observable<string>[] = [];
-          products.forEach(product=>{
-            let deleteCall: Observable<string> = this.deleteProduct(product); 
-            deleteCalls.push(deleteCall);
-          })
-          return combineLatest(deleteCalls);
-        })
-      ).subscribe((deleteResults: string[])=>{
-        console.log('All deletecalls returned.');      
-        subscriber.next(deleteResults);
-      })
-    }) as Observable<string[]>;
-    return observable;
-  }
-
-  observableTestB(){
-    let observable = new Observable(subscriber=>{
-      this.fetchProduct('A1').subscribe((p)=>{
-        let product = p as string;
-        this.fetchSimilarProducts(product).subscribe(sp=>{          
-          subscriber.next(sp)
-        })
-      });
-    }) as Observable<string[]>
-    return observable;
-  }
-
-  fetchProduct(productId: string): Observable<string> {
-    let observable = new Observable(subscriber=>{
-      console.log('Fetching product with id: ', productId);
-      setTimeout(()=>{
-        let product = 'product' + productId;
-        console.log(product + ' found');
-        subscriber.next(product);
-      }, 100);
-    }) as Observable<string>
-    return observable;
-  }
-
-  fetchSimilarProducts(product: string) {
-    let observable = new Observable(subscriber=>{
-      console.log('Fetching similar products for ', product);
-      setTimeout(()=>{
-        let similarProducts = [];
-        for(let i = 0; i < 3; i++){
-          similarProducts.push(product + i);
-        }
-        console.log('similar products found');
-        subscriber.next(similarProducts);
-      }, 100);
-    }) as Observable<string[]>
-    return observable;
-  }
-
-  deleteProduct(product: string){
-    let observable = new Observable(subscriber=>{
-      console.log('deleting ' + product);
-      setTimeout(()=>{
-        console.log(product + ' deleted.');
-        subscriber.next(product);
-      }, 100);
-    }) as Observable<string>
-    return observable;
-  }
-
   postTask(task: Task){
     return this.http.post(this.tasksUrl, task);
   }
@@ -107,136 +33,27 @@ export class TaskService {
     return this.http.get(this.tasksUrl + `/${taskId}`);
   }
 
-  putTask(task: Task){
-    let observable = new Observable(observer=>{
-      this.dependencyCheck(task).subscribe(open=>{
-        console.log('dependency check finished');        
-        if(!open){
-          task.status = 'waiting'; 
-        }
-        else{
-          if (task.status == 'waiting'){
-            task.status = 'open';
-          }
-        }        
+  putTask(task: Task): Observable<void>{
+    let observable = new Observable<void>(subscriber=>{
+      this.dependencyCheckAndUpdate(task).subscribe(()=>{        
         this.http.put(this.tasksUrl + `/${task._id}`, task).subscribe(()=>{ 
           if(task.status == 'finished'){
-            console.log(`Updating status of tasks depending on ${task.title}`);
-            this.updateDependantTasks(task).subscribe(()=>{
-              console.log('upDateDependantTasks finished');              
-              observer.next(); 
+            this.updateDependantTasks(task._id).subscribe(()=>{           
+              subscriber.next(); 
             });
           }  
           else {            
-            observer.next();
+            subscriber.next();
           }
-        });        
-        
-      }) 
+        });    
+      }); 
     })
     return observable;
   }
 
-  private dependencyCheck(task: Task): Observable<boolean> { 
-    console.log(`Performing dependencycheck for task:${task.title}`);
-    let observable = new Observable<boolean>(observer => {
-      this.getDependencyTasks(task._id).subscribe((res)=> {
-        console.log('dependency tasks loaded');
-        
-        let dependencyTasks = res as Array<Task>;
-        let open = true;                 
-        for(let dTask of dependencyTasks){
-          if(open){            
-            if(dTask.status!='finished'){
-              open = false;        
-            }
-          }
-        }
-        observer.next(open);
-      })    
-    })   
-    return observable;
-  }
-
-  private getDependencyTasks(taskId: string) {
-    let observable = new Observable(observer=>{
-      this.dependencyService.getTaskDependencies(taskId).subscribe((results)=>{
-        let dependencies = results as Array<Dependency>;
-        if(dependencies.length > 0){
-          let taskCalls: Observable<Task>[] = [];
-          dependencies.forEach((dependency)=>{
-            const taskCall = this.getTask(dependency.dependency_id) as Observable<Task>;
-            taskCalls.push(taskCall);
-          })
-          
-          forkJoin(taskCalls).subscribe((res)=>{            
-            observer.next(res);
-          })       
-        }
-        else{
-          observer.next([]);
-        }         
-      })
-    });
-    return observable;
-  }
-
-  private updateDependantTasks(task: Task): Observable<void> {     
-    console.log(`Performing updateDependantTasks for task:${task._id}`);
-    //get dependant tasks
-    //perform dependency check for each dependant task that has status waiting
-    //for each dependant task: if dependency check yields true value for open, update the dependant task status to open    
-    let observable = new Observable (observer => {
-      this.getDependantTasks(task._id).pipe(
-        switchMap((dependantTasks: Task[]) => {
-          let checkAndUpdateCalls: Observable<boolean>[] = [];
-          dependantTasks.forEach(dTask => {
-            if(dTask.status == 'waiting'){
-              let checkAndUpdateCall = this.dependencyCheckAndUpdate(dTask);
-              checkAndUpdateCalls.push(checkAndUpdateCall);
-            }
-          })
-          return combineLatest(checkAndUpdateCalls);
-        })
-      ).subscribe((results)=>{
-          console.log(results);
-          observer.next();
-      });
-    }) as Observable<void>;
-    return observable;
-  }   
-
-  private getDependantTasks(taskId: string): Observable<Task[]> {
-    let observable = new Observable(observer=>{
-      this.dependencyService.getDependenciesOn(taskId).subscribe((results)=>{
-        let dependenciesOn = results as Array<Dependency>;
-        console.log(`${dependenciesOn.length} dependenciesOn found:`)
-        console.log(dependenciesOn);
-        
-        if(dependenciesOn.length > 0){
-          let taskCalls: Observable<Task>[] = [];
-          dependenciesOn.forEach((dependency)=>{
-            const taskCall = this.getTask(dependency.task_id) as Observable<Task>;
-            taskCalls.push(taskCall);
-          })
-          
-          forkJoin(taskCalls).subscribe((res)=>{
-            console.log('dependant tasks loaded');            
-            observer.next(res);
-          })       
-        }
-        else{
-          console.log('no dependant tasks');
-          observer.next([]);
-        }         
-      })
-    }) as Observable<Task[]>;
-    return observable;
-  }
-
-  private dependencyCheckAndUpdate(task: Task): Observable<boolean> { 
+  private dependencyCheckAndUpdate(task: Task): Observable<void> { 
     console.log(`Performing dependencyCheckAndUpdate for ${task.title}`);
-    let observable = new Observable<boolean>(observer => {
+    let observable = new Observable(subscriber => {
       this.getDependencyTasks(task._id).subscribe((res)=> {        
         let dependencyTasks = res as Array<Task>;
         let open = true;                 
@@ -253,18 +70,101 @@ export class TaskService {
           task.status = 'open';          
           this.http.put(this.tasksUrl + `/${task._id}`, task).subscribe((res)=>{
             console.log(`dependencyCheckAndUpdate for ${task.title} finished`);
-            observer.next(open);
+            subscriber.next();
           });
         }
         else {
           console.log(`dependencyCheckAndUpdate for ${task.title} finished`);
-          observer.next(open);
+          subscriber.next();
         }        
       })    
-    }) as Observable<boolean>;
+    }) as Observable<void>;
     return observable;
   }
 
+  private getDependencyTasks(taskId: string): Observable<Task[]> {
+    let observable = new Observable<Task[]>(subscriber=>{
+      this.dependencyService.getTaskDependencies(taskId).subscribe((results)=>{
+        let dependencies = results as Array<Dependency>;
+        if(dependencies.length > 0){
+          let taskCalls: Observable<Task>[] = [];
+          dependencies.forEach((dependency)=>{
+            const taskCall = this.getTask(dependency.dependency_id) as Observable<Task>;
+            taskCalls.push(taskCall);
+          });          
+          combineLatest(taskCalls).subscribe((res)=>{            
+            subscriber.next(res);
+          });
+        }
+        else{
+          subscriber.next([]);
+        }         
+      })
+    });
+    return observable;
+  }
+
+  private updateDependantTasks(taskId: string): Observable<void> {     
+    console.log(`Performing updateDependantTasks for task:${taskId}`);
+    let observable = new Observable(subscriber => {
+      this.getDependantTasks(taskId).pipe(
+        switchMap((dependantTasks: Task[])=>{  
+          return this.dependencyCheckAndUpdateAll(dependantTasks);
+        })
+      ).subscribe(()=>{
+          subscriber.next();
+      });
+    }) as Observable<void>;
+    return observable;
+  }   
+
+  private dependencyCheckAndUpdateAll(tasks: Task[]): Observable<void>{
+    let observable = new Observable<void>(subscriber=>{
+      let checkAndUpdateCalls: Observable<void>[] = [];
+          tasks.forEach(task => {   
+            if(task.status == 'waiting'){
+              let checkAndUpdateCall = this.dependencyCheckAndUpdate(task);
+              checkAndUpdateCalls.push(checkAndUpdateCall);
+            }
+          })
+          if(checkAndUpdateCalls.length > 0){
+            combineLatest(checkAndUpdateCalls).subscribe(()=>{
+              console.log('All check and update calls finished.');            
+              subscriber.next();
+            });
+          } 
+          else{
+            subscriber.next();
+          } 
+    });
+    return observable;
+  }
+
+  private getDependantTasks(taskId: string): Observable<Task[]> {
+    let observable = new Observable(subscriber=>{
+      this.dependencyService.getDependenciesOn(taskId).subscribe((results)=>{
+        let dependenciesOn = results as Array<Dependency>;        
+        if(dependenciesOn.length > 0){
+          let taskCalls: Observable<Task>[] = [];
+          dependenciesOn.forEach((dependency)=>{
+            const taskCall = this.getTask(dependency.task_id) as Observable<Task>;
+            taskCalls.push(taskCall);
+          });          
+          forkJoin(taskCalls).subscribe((tasks)=>{
+            console.log('dependant tasks loaded');  
+            console.log(tasks);          
+            subscriber.next(tasks);
+          });       
+        }
+        else{
+          console.log('no dependant tasks');
+          subscriber.next([]);
+        }         
+      })
+    }) as Observable<Task[]>;
+    return observable;
+  }
+  
   deleteTask(taskId: string){
     this.deleteAssignments(taskId);
     this.deleteDependenciesOf(taskId);
