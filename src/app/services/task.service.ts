@@ -171,13 +171,19 @@ export class TaskService {
         let task = taskData as Task;
         task.status='finished'; //First save the task as finished so the dependant tasks can be updated before task deletion.
         this.http.put(this.tasksUrl + `/${taskId}`, task).subscribe(()=>{
-          this.updateDependantTasks(taskId).subscribe(()=>{
-            this.deleteAssignments(taskId);
+          this.updateDependantTasks(taskId).subscribe(()=>{            
+            //The deletion of the dependencies for this task can happen asynchronously now
+            //because they don't matter anymore now the dependant tasks are updated.
             this.deleteDependenciesOf(taskId);
             this.deleteDependenciesOn(taskId);
-            this.http.delete(this.tasksUrl + `/${taskId}`).subscribe(()=>{
-              subscriber.next();
-            });
+
+            //The assignments, however, do need to finish up deleting before this observable completes,
+            //because they might be used to reload the tasks for a specific user
+            this.deleteAssignments(taskId).subscribe(()=>{
+              this.http.delete(this.tasksUrl + `/${taskId}`).subscribe(()=>{
+                subscriber.next();
+              });
+            }); 
           })
         })
       });      
@@ -185,14 +191,26 @@ export class TaskService {
     return observable;    
   }
 
-  private deleteAssignments(taskId: string){
-    this.assignmentService.getTaskAssignments(taskId)
+  private deleteAssignments(taskId: string): Observable<void>{
+    let observable = new Observable<void>(subscriber=>{
+      this.assignmentService.getTaskAssignments(taskId)
       .subscribe((results) => {
         let taskAssignments = results as Array<Assignment>;
+        let deleteCalls: Observable<Object>[] = [];
         taskAssignments.forEach((assignment)=>{
-          this.assignmentService.deleteAssignment(assignment._id).subscribe();
+          deleteCalls.push(this.assignmentService.deleteAssignment(assignment._id));
         })
+        if(deleteCalls.length > 0){
+          combineLatest(deleteCalls).subscribe(()=>{               
+            subscriber.next();
+          })
+        }
+        else{
+          subscriber.next();
+        }        
       })
+    })
+    return observable;
   }
 
   private deleteDependenciesOf(taskId: string){
