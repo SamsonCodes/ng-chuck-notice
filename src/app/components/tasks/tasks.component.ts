@@ -1,11 +1,17 @@
 import { Component, OnInit } from '@angular/core';
 import { FormArray, FormBuilder } from '@angular/forms';
+import { Observable, combineLatest } from 'rxjs';
+import { defaultIfEmpty, switchMap } from 'rxjs/operators';
 
 import { TaskService } from '../../services/task.service';
 import { Task } from '../../classes/task';
 import { convertToDateString } from '../../dateHelper';
 import { User } from 'src/app/classes/user';
 import { UserService } from 'src/app/services/user.service';
+import { Assignment } from 'src/app/classes/assignment';
+import { AssignmentService } from 'src/app/services/assignment.service';
+import { Dependency } from 'src/app/classes/dependency';
+import { DependencyService } from 'src/app/services/dependency.service';
 
 @Component({
   selector: 'tasks',
@@ -35,25 +41,19 @@ export class TasksComponent implements OnInit {
     dependencies: this.fb.array([])
   });
 
-  otherTasks: Task[] = [];
   allUsers: User[] = [];
   
   constructor(
     private taskService: TaskService,
     private userService: UserService, 
+    private assignmentService: AssignmentService,
+    private dependencyService: DependencyService,
     private fb: FormBuilder
   ) {}
 
   ngOnInit(): void {
     this.refreshTaskList();
-    this.getAllTasks();
     this.getAllUsers();
-  }
-
-  getAllTasks(): void {
-    this.taskService.getTasks().subscribe((res)=>{
-      this.otherTasks = res as Task[];  
-    })
   }
 
   getAllUsers(): void {
@@ -71,11 +71,52 @@ export class TasksComponent implements OnInit {
 
   onSubmit(){        
     this.newTask.created_on = this.getCreatedOn();
-    this.taskService.postTask(this.newTask).subscribe((res) => {
+    this.taskService.postTask(this.newTask).pipe(      
+      switchMap((taskData) => {
+        let task = taskData as Task;
+        let observableList = [];
+        observableList.push(this.submitAssignments(this.taskForm.value.assignments, task._id));
+        observableList.push(this.submitDependencies(this.taskForm.value.dependencies, task._id));
+        return combineLatest(observableList);
+      }),
+      defaultIfEmpty()
+    ).subscribe(()=>{        
       this.refreshTaskList();
       this.resetForm();
-    });      
+    });
   }
+
+  submitAssignments(formAssignmentValues: Array<string>, taskId: string): Observable<Object[]>{  
+    let formAmount = formAssignmentValues.length;
+    let databaseCalls = [];
+    for(let i = 0; i < formAmount; i++){
+      let newAssignment: Assignment = 
+      {
+        _id: '',
+        user_id: formAssignmentValues[i],
+        task_id: taskId
+      };
+      databaseCalls.push(this.assignmentService.postAssignment(newAssignment));
+    }
+    return combineLatest(databaseCalls);
+  }
+
+  submitDependencies(formDependencyValues: Array<string>, taskId: string): Observable<Object[]> {
+    let formAmount = formDependencyValues.length;
+    
+    let databaseCalls = [];
+    for(let i = 0; i < formAmount; i++){
+      let newDependency: Dependency = 
+      {
+        _id: '',
+        dependency_id: formDependencyValues[i],
+        task_id: taskId
+      };
+      databaseCalls.push(this.dependencyService.postDependency(newDependency));
+    } 
+    return combineLatest(databaseCalls);
+  }
+
 
   getCreatedOn(){
     var today = new Date();
@@ -118,7 +159,7 @@ export class TasksComponent implements OnInit {
     this.formAssignments.push(this.fb.control(''));
   }
 
-  removeAssignment(i: number): void {
+  removeAssignment(i: number): void {    
     this.formAssignments.removeAt(i);
   }
 
@@ -133,6 +174,9 @@ export class TasksComponent implements OnInit {
 
   removeDependency(i: number): void {
     this.formDependencies.removeAt(i);
+    if(this.formDependencies.length == 0){
+      this.taskForm.patchValue({status: 'open'});
+    }
   }
 
   logger(){
