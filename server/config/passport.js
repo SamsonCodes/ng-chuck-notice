@@ -9,15 +9,17 @@ const customFields = {
 };
 
 const verifyCallback = (username, password, done) => {
-
-    User.findOne({ username: username })
+    console.log(username);
+    User.findOne({ name: username })
         .then((user) => {
-
+            console.log('Found user');
+            console.log(user);
             if (!user) { return done(null, false) }
             
             const isValid = validPassword(password, user.hash, user.salt);
-            
+            console.log(isValid)
             if (isValid) {
+                console.log('login successful');
                 return done(null, user);
             } else {
                 return done(null, false);
