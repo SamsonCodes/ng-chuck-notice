@@ -9,7 +9,9 @@ const router = express.Router();
 router.use(morgan("combined"));
 
 router.post('/', userController.addOne);
-router.post('/login', passport.authenticate('local', {successRedirect: "/protected-route", failureRedirect: "/protected-route"}));
+router.post('/login', passport.authenticate('local'), (req, res)=>{
+    res.send({msg: `logged in as ${req.user.name}`});
+});
 router.get('/', userController.list);
 router.get('/:id', userController.getOne);
 router.put('/:id', userController.updateOne);
