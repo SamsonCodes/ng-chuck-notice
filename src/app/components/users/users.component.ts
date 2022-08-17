@@ -36,7 +36,7 @@ export class UsersComponent implements OnInit {
     this.refreshUserList();
   }
 
-  onSubmit(){
+  onSubmit(){    
     this.userService.postUser(this.newUser).subscribe((res) => {
       this.refreshUserList();
       this.resetForm();

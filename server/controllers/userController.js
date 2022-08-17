@@ -1,14 +1,16 @@
 const User = require('../models/user');
+const genPassword = require('../lib/passwordUtils').genPassword;
 
 //CREATE
-module.exports.addOne = function(req, res){ 
-    var newUserData = unpackUserData(req);
-    var newUser = new User(newUserData);
+module.exports.addOne = function(req, res){     
+    const userData = unpackUserData(req);
+    var newUser = new User(userData);
     newUser.save((err, doc) => {
-        if(!err){ res.send(doc);}
+        if(!err){ 
+            res.send(doc);
+        }
         else {
-            console.log('User post error:' + JSON.stringify(err, undefined, 2)); 
-            res.send(err);
+            return handleError(err, res);
         }
     });
 }
@@ -42,8 +44,7 @@ module.exports.updateOne = function(req, res){
     User.findByIdAndUpdate(req.params.id, {$set : newUserData }, {new: true}, (err, doc) => {
         if(!err){ res.send(doc);}
         else {
-            console.log('User update error:' + JSON.stringify(err, undefined, 2)); 
-            res.send(err);
+            return handleError(err, res);
         }
     })
 }
@@ -53,16 +54,21 @@ module.exports.deleteOne = function(req, res){
     User.findByIdAndDelete(req.params.id, (err, doc) => {
         if(!err){ res.send(doc);}
         else {
-            console.log('User delete error:' + JSON.stringify(err, undefined, 2)); 
-            res.send(err);
+            return handleError(err, res);
         }
     })
 }
 
 function unpackUserData(req){
+    const saltHash = genPassword(req.body.password);
+    
+    const salt = saltHash.salt;
+    const hash = saltHash.hash;
+
     var userData = {
         name: req.body.name,
-        password: req.body.password,
+        hash: hash,
+        salt: salt,
         userGroup: req.body.userGroup,
         penalties: req.body.penalties
     }
