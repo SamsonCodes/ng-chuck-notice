@@ -6,6 +6,7 @@ import { UsersComponent } from './components/users/users.component';
 import { TasksComponent } from './components/tasks/tasks.component';
 import { EditTaskComponent } from './components/edit-task/edit-task.component';
 import { LoginComponent } from './components/login/login.component';
+import { ProtectedComponent as ProtectedComponent } from './components/protected/protected.component';
 
 const routes: Routes = [
   { path: '', redirectTo: '/users', pathMatch: 'full'},
@@ -13,7 +14,8 @@ const routes: Routes = [
   { path: 'tasks', component:TasksComponent },
   { path: 'edit-user/:id', component: EditUserComponent },
   { path: 'edit-task/:id', component: EditTaskComponent },
-  { path: 'login', component: LoginComponent}
+  { path: 'login', component: LoginComponent},
+  { path: 'protected', component: ProtectedComponent }
 ];
 
 
