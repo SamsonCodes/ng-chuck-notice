@@ -41,6 +41,8 @@ testem.log
 /typings
 ~$*
 notes/TO*DO.txt
+.env
+*.pem
 
 # System Files
 .DS_Store
