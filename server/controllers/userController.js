@@ -1,5 +1,6 @@
 const User = require('../models/user');
-const genPassword = require('../lib/passwordUtils').genPassword;
+const genPassword = require('../lib/utils').genPassword;
+const utils = require('../lib/utils');
 
 //CREATE
 module.exports.addOne = function(req, res){     
@@ -12,6 +13,40 @@ module.exports.addOne = function(req, res){
         else {
             return handleError(err, res);
         }
+    });
+}
+
+module.exports.login = function(req, res, next){
+    User.findOne({ name: req.body.name })
+    .then((user) => {
+
+        if (!user) {
+            return res.status(401).json({ success: false, msg: "could not find user" });
+        }
+        
+        // Function defined at bottom of app.js
+        const isValid = utils.validPassword(req.body.password, user.hash, user.salt);
+        
+        if (isValid) {
+
+            const tokenObject = utils.issueJWT(user);
+
+            res.status(200).json({ 
+                success: true, 
+                user: user, 
+                token: tokenObject.token, 
+                expiresIn: tokenObject.expires 
+            });
+
+        } else {
+
+            res.status(401).json({ success: false, msg: "you entered the wrong password" });
+
+        }
+
+    })
+    .catch((err) => {
+        next(err);
     });
 }
 
