@@ -10,6 +10,7 @@ import { User } from '../classes/user';
 export class AuthService {
   private currentUserSubject: Subject<User>;
   public currentUser: Observable<User>;
+  public currentUserVar: User | undefined;
 
   constructor() {
     this.currentUserSubject = new Subject<User>();
@@ -29,6 +30,7 @@ export class AuthService {
       payload.userGroup,
       payload.penalties
     );
+    this.currentUserVar = user;
     this.currentUserSubject.next(user);
   }          
 
