@@ -16,7 +16,7 @@ export class HeaderComponent implements OnInit {
   ngOnInit(): void {
     this.authService.currentUser?.subscribe((x)=>{
       this.currentUser=x;
-      console.log('header user value updated');
+      console.log('Current User:')
       console.log(this.currentUser);
     });
   }

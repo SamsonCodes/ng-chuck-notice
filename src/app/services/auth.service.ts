@@ -17,18 +17,17 @@ export class AuthService {
   } 
 
   setLocalStorage(responseObj: any) {
-    console.log(responseObj.expiresIn);
-
     const expires = moment().add(1, 'days');
-    console.log(`expires: ${JSON.stringify(expires.valueOf())}`);
     localStorage.setItem('token', responseObj.token);
     localStorage.setItem('expires', JSON.stringify(expires.valueOf()));
+    let token = responseObj.token.split(' ')[1];  //Remove Bearer prefix  
+    let payload = this.parseJwt(token);
     let user = new User(
-      responseObj.user._id, 
-      responseObj.user.name,
+      payload.sub, 
+      payload.name,
       "",
-      responseObj.user.userGroup,
-      0
+      payload.userGroup,
+      payload.penalties
     );
     this.currentUserSubject.next(user);
   }          
@@ -40,21 +39,26 @@ export class AuthService {
   }
 
   isLoggedIn() {
-    console.log(moment());
-      return moment().isBefore(this.getExpiration());
+    return moment().isBefore(this.getExpiration());
   }
 
   isLoggedOut() {
-      return !this.isLoggedIn();
+    return !this.isLoggedIn();
   }
 
   getExpiration() {
-      const expiration = localStorage.getItem("expires");
-      if (expiration) {
-          const expiresAt = JSON.parse(expiration);
-          return moment(expiresAt);
-      } else {
-          return moment();
-      }
+    const expiration = localStorage.getItem("expires");
+    if (expiration) {
+        const expiresAt = JSON.parse(expiration);
+        return moment(expiresAt);
+    } else {
+        return moment();
+    }
   }    
+
+  parseJwt(token: string) {
+    var base64Url = token.split('.')[1];
+    var base64 = base64Url.replace('-', '+').replace('_', '/');
+    return JSON.parse(atob(base64));
+  }
 }

@@ -24,7 +24,6 @@ export class LoginComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    console.log('Working...')
   }
 
   onSubmit(): void {
@@ -42,7 +41,6 @@ export class LoginComponent implements OnInit {
       
       // The response data
       (response) => {
-        console.log(response)
         // If the user authenticates successfully, we need to store the JWT returned in localStorage
         this.authService.setLocalStorage(response);
 
@@ -55,7 +53,6 @@ export class LoginComponent implements OnInit {
       
       // When observable completes
       () => {
-        console.log('done!');
         this.router.navigate(['']);
       }
 

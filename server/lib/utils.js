@@ -55,6 +55,9 @@ function issueJWT(user) {
 
   const payload = {
     sub: _id,
+    name: user.name,
+    userGroup: user.userGroup, 
+    penalties: user.penalties,
     iat: Date.now()
   };
 

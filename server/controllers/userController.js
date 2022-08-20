@@ -32,8 +32,7 @@ module.exports.login = function(req, res, next){
             const tokenObject = utils.issueJWT(user);
 
             res.status(200).json({ 
-                success: true, 
-                user: user, 
+                success: true,
                 token: tokenObject.token, 
                 expiresIn: tokenObject.expires 
             });
