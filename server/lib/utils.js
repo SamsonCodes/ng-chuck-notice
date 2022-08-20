@@ -69,6 +69,11 @@ function issueJWT(user) {
   }
 }
 
+function parseJwt(token) {
+  return JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString());
+}
+
 module.exports.validPassword = validPassword;
 module.exports.genPassword = genPassword;
 module.exports.issueJWT = issueJWT;
+module.exports.parseJwt = parseJwt;
