@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { forkJoin, Observable, combineLatest } from 'rxjs';
+import { forkJoin, Observable, combineLatest, Subscriber } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 
 import { Task } from '../classes/task';
@@ -31,6 +31,23 @@ export class TaskService {
 
   getTask(taskId: string){
     return this.http.get(this.tasksUrl + `/${taskId}`);
+  }
+
+  getUserTasks(userId: string){
+    let observable = new Observable(subscriber => {
+      this.assignmentService.getUserAssignments(userId).subscribe((assignmentObjects)=>{
+        let assignments = assignmentObjects as Array<Assignment>;
+        let taskCalls: Observable<Object>[] = [];
+        assignments.forEach(assignment=>{
+          let taskCall = this.getTask(assignment.task_id);
+          taskCalls.push(taskCall);
+        });
+        combineLatest(taskCalls).subscribe((taskObjects)=>{            
+          subscriber.next(taskObjects);
+        });
+      })
+    })
+    return observable;
   }
 
   putTask(task: Task): Observable<void>{

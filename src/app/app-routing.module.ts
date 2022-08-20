@@ -9,6 +9,7 @@ import { LoginComponent } from './components/login/login.component';
 import { ProtectedComponent as ProtectedComponent } from './components/protected/protected.component';
 import { IsAuthenticatedGuard } from './guards/is-authenticated.guard';
 import { IsAdminGuard } from './guards/is-admin.guard';
+import { IsAssignedGuard } from './guards/is-assigned.guard';
 
 const routes: Routes = [
   { path: '', redirectTo: '/tasks', pathMatch: 'full'},
@@ -31,7 +32,7 @@ const routes: Routes = [
   { 
     path: 'edit-task/:id', 
     component: EditTaskComponent,
-    canActivate: [IsAuthenticatedGuard]
+    canActivate: [IsAuthenticatedGuard, IsAssignedGuard]
   },  
   { 
     path: 'protected', 

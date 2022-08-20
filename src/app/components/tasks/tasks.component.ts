@@ -63,12 +63,19 @@ export class TasksComponent implements OnInit {
       this.allUsers = res as User[];  
     });
   }
-
   
   refreshTaskList(){
-    this.taskService.getTasks().subscribe((res) => {
-      this.tasks = res as Task[];
-    });
+    if(!this.authService.isManager()){
+      let userId = this.authService.getUser()!._id;
+      this.taskService.getUserTasks(userId).subscribe((res) => {
+        this.tasks = res as Task[];
+      });
+    }
+    else{
+      this.taskService.getTasks().subscribe((res) => {
+        this.tasks = res as Task[];
+      });
+    }    
   }
 
   onSubmit(){        
