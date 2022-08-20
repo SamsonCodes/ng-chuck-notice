@@ -10,12 +10,28 @@ import { ProtectedComponent as ProtectedComponent } from './components/protected
 import { IsAuthenticatedGuard } from './guards/is-authenticated.guard';
 
 const routes: Routes = [
-  { path: '', redirectTo: '/users', pathMatch: 'full'},
-  { path: 'users', component: UsersComponent },
-  { path: 'tasks', component:TasksComponent },
-  { path: 'edit-user/:id', component: EditUserComponent },
-  { path: 'edit-task/:id', component: EditTaskComponent },
+  { path: '', redirectTo: '/tasks', pathMatch: 'full'},
   { path: 'login', component: LoginComponent},
+  { 
+    path: 'users', 
+    component: UsersComponent,
+    canActivate: [IsAuthenticatedGuard]
+  },
+  { 
+    path: 'tasks', 
+    component:TasksComponent,
+    canActivate: [IsAuthenticatedGuard]
+  },
+  { 
+    path: 'edit-user/:id', 
+    component: EditUserComponent,
+    canActivate: [IsAuthenticatedGuard]
+  },
+  { 
+    path: 'edit-task/:id', 
+    component: EditTaskComponent,
+    canActivate: [IsAuthenticatedGuard]
+  },  
   { 
     path: 'protected', 
     component: ProtectedComponent,

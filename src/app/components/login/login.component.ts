@@ -56,7 +56,7 @@ export class LoginComponent implements OnInit {
       // When observable completes
       () => {
         console.log('done!');
-        this.router.navigate(['protected']);
+        this.router.navigate(['']);
       }
 
     );

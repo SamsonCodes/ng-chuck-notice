@@ -14,7 +14,7 @@ export class AuthService {
   constructor() {
     this.currentUserSubject = new Subject<User>();
     this.currentUser = this.currentUserSubject.asObservable();
-  }  
+  } 
 
   setLocalStorage(responseObj: any) {
     console.log(responseObj.expiresIn);
