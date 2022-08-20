@@ -7,17 +7,17 @@ import { AuthService } from 'src/app/services/auth.service';
   styleUrls: ['./header.component.css']
 })
 export class HeaderComponent implements OnInit {
-  loggedIn: boolean = false;
+  currentUser: any | undefined;
 
   constructor(
     private authService: AuthService    
   ) { }
 
   ngOnInit(): void {
-    this.loggedIn = this.authService.isLoggedIn();
-  }
-
-  onRefresh(): void {
-    this.loggedIn = this.authService.isLoggedIn();
+    this.authService.currentUser?.subscribe((x)=>{
+      this.currentUser=x;
+      console.log('header user value updated');
+      console.log(this.currentUser);
+    });
   }
 }
