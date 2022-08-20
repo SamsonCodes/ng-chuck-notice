@@ -10,11 +10,12 @@ export class HeaderComponent implements OnInit {
   currentUser: any | undefined;
 
   constructor(
-    private authService: AuthService    
+    private authService: AuthService
   ) { }
 
   ngOnInit(): void {
-    this.authService.currentUser?.subscribe((x)=>{
+    this.currentUser = this.authService.getUser();
+    this.authService.currentUser.subscribe((x)=>{
       this.currentUser=x;
       console.log('Current User:')
       console.log(this.currentUser);
@@ -23,5 +24,12 @@ export class HeaderComponent implements OnInit {
 
   onLogout(): void {
     this.authService.logout();
+  }
+
+  isAdmin(): boolean {
+    if(!this.currentUser){
+      return false;
+    }
+    return this.currentUser.userGroup == "admins";
   }
 }

@@ -53,6 +53,7 @@ export class LoginComponent implements OnInit {
       
       // When observable completes
       () => {
+        console.log('redirecting to /')
         this.router.navigate(['']);
       }
 

@@ -10,7 +10,6 @@ import { User } from '../classes/user';
 export class AuthService {
   private currentUserSubject: Subject<User>;
   public currentUser: Observable<User>;
-  public currentUserVar: User | undefined;
 
   constructor() {
     this.currentUserSubject = new Subject<User>();
@@ -23,25 +22,40 @@ export class AuthService {
     localStorage.setItem('expires', JSON.stringify(expires.valueOf()));
     let token = responseObj.token.split(' ')[1];  //Remove Bearer prefix  
     let payload = this.parseJwt(token);
-    let user = new User(
+    let user = this.extractUserFromPayload(payload);
+    this.currentUserSubject.next(user);
+  }          
+
+  logout() {
+    console.log('logging out');
+    localStorage.removeItem('token');
+    localStorage.removeItem('expires');
+    this.currentUserSubject.next(undefined);
+  }
+
+  isLoggedIn() {
+    return moment().isBefore(this.getExpiration());
+  }
+
+  getUser(): User | undefined {
+    let token = localStorage.getItem('token');
+    if(token){
+      let payload = this.parseJwt(token);
+      return this.extractUserFromPayload(payload);
+    }
+    else{
+      return undefined;
+    }      
+  }
+
+  extractUserFromPayload(payload: any) : User {
+    return new User(
       payload.sub, 
       payload.name,
       "",
       payload.userGroup,
       payload.penalties
     );
-    this.currentUserVar = user;
-    this.currentUserSubject.next(user);
-  }          
-
-  logout() {
-      localStorage.removeItem('token');
-      localStorage.removeItem('expires');
-      this.currentUserSubject.next(undefined);
-  }
-
-  isLoggedIn() {
-    return moment().isBefore(this.getExpiration());
   }
 
   isLoggedOut() {
