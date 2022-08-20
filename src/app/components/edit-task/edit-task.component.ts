@@ -13,6 +13,7 @@ import { UserService } from 'src/app/services/user.service';
 import { User } from 'src/app/classes/user';
 import { DependencyService } from 'src/app/services/dependency.service';
 import { Dependency } from 'src/app/classes/dependency';
+import { AuthService } from 'src/app/services/auth.service';
 
 
 @Component({
@@ -50,7 +51,8 @@ export class EditTaskComponent implements OnInit {
     private assignmentService: AssignmentService,
     private userService: UserService,
     private dependencyService: DependencyService,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private authService: AuthService
   ) {}
 
   ngOnInit(): void {
@@ -281,5 +283,13 @@ export class EditTaskComponent implements OnInit {
       let range = tempRange.map((val)=>{return val + from})
       return range; //Example: range(1,3) returns [1,2,3]
     }    
-  }   
+  }  
+
+  isManager(): boolean {
+    return this.authService.isManager();
+  } 
+
+  getUserName(id:string){
+    return this.allUsers.find(element=> element._id == id)?.name;
+  }
 }

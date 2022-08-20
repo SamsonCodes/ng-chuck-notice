@@ -12,6 +12,7 @@ import { Assignment } from 'src/app/classes/assignment';
 import { AssignmentService } from 'src/app/services/assignment.service';
 import { Dependency } from 'src/app/classes/dependency';
 import { DependencyService } from 'src/app/services/dependency.service';
+import { AuthService } from 'src/app/services/auth.service';
 
 @Component({
   selector: 'tasks',
@@ -48,7 +49,8 @@ export class TasksComponent implements OnInit {
     private userService: UserService, 
     private assignmentService: AssignmentService,
     private dependencyService: DependencyService,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private authService: AuthService
   ) {}
 
   ngOnInit(): void {
@@ -75,7 +77,15 @@ export class TasksComponent implements OnInit {
       switchMap((taskData) => {
         let task = taskData as Task;
         let observableList = [];
-        observableList.push(this.submitAssignments(this.taskForm.value.assignments, task._id));
+        let assignments: string[] = [];
+        if(this.isManager()){          
+         assignments = this.taskForm.value.assignments;
+        }
+        else{
+          let id = this.authService.getUser()!._id;
+          assignments = [id!];          
+        }
+        observableList.push(this.submitAssignments(assignments, task._id));
         observableList.push(this.submitDependencies(this.taskForm.value.dependencies, task._id));
         return combineLatest(observableList);
       }),
@@ -182,5 +192,9 @@ export class TasksComponent implements OnInit {
   logger(){
     console.log(this.taskForm.value);
     console.log(this.newTask);
+  }
+
+  isManager(): boolean {
+    return this.authService.isManager();
   }
 }

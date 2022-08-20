@@ -42,8 +42,8 @@
           <option *ngIf="this.selectedTask.status != 'waiting'" value="finished">Finished</option>
         </select>
     </div>
-    <div formArrayName="assignments" class="form-group">
-        <h2>Assignments</h2>   
+    <div *ngIf= "isManager()" formArrayName="assignments" class="form-group">
+        <h2>Assignments</h2> 
         <div *ngFor="let assignment of formAssignments.controls; let i=index">
             <!-- The repeated assignment template -->
             <select id="assignment-{{ i }}" type="text" [formControlName]="i">
@@ -54,7 +54,15 @@
             </span>       
         </div>
         <button type="button" (click)="addAssignment()">+ Add</button>
-    </div><div formArrayName="dependencies" class="form-group">
+    </div>
+    <div *ngIf= "!isManager()" class="form-group">
+        <h2>Assignments</h2> 
+        <div *ngFor="let assignment of formAssignments.controls; let i=index">
+            <!-- The repeated assignment template -->
+            <span>{{getUserName(assignment.value)}}</span>
+        </div>
+    </div>
+    <div formArrayName="dependencies" class="form-group">
         <h2>Dependencies</h2>   
         <div *ngFor="let dependency of formDependencies.controls; let i=index">
             <!-- The repeated dependency template -->

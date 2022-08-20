@@ -41,18 +41,21 @@
         </select>
     </div>
     <div formArrayName="assignments" class="form-group">
-        <h2>Assignments</h2>   
-        <div *ngFor="let assignment of formAssignments.controls; let i=index">
-            <!-- The repeated assignment template -->
-            <select id="assignment-{{ i }}" type="text" [formControlName]="i">
-                <option *ngFor="let user of this.allUsers" value="{{user._id}}">{{user.name}}</option>
-            </select>   
-            <span (click)="removeAssignment(i)">
-                <i class="material-icons">delete</i>
-            </span>       
+        <div *ngIf="isManager()">
+            <h2>Assignments</h2>   
+            <div *ngFor="let assignment of formAssignments.controls; let i=index">
+                <!-- The repeated assignment template -->
+                <select id="assignment-{{ i }}" type="text" [formControlName]="i">
+                    <option *ngFor="let user of this.allUsers" value="{{user._id}}">{{user.name}}</option>
+                </select>   
+                <span (click)="removeAssignment(i)">
+                    <i class="material-icons">delete</i>
+                </span>       
+            </div>
+            <button type="button" (click)="addAssignment()">+ Add</button>
         </div>
-        <button type="button" (click)="addAssignment()">+ Add</button>
-    </div><div formArrayName="dependencies" class="form-group">
+    </div>
+    <div formArrayName="dependencies" class="form-group">
         <h2>Dependencies</h2>   
         <div *ngFor="let dependency of formDependencies.controls; let i=index">
             <!-- The repeated dependency template -->

@@ -48,6 +48,15 @@ export class AuthService {
     }      
   }
 
+  isManager(): boolean {    
+    let user = this.getUser();
+    if(user){
+      return (user.userGroup === 'managers' || user.userGroup === 'admins');
+      //For now, admins have manager rights too.
+    }
+    return false;
+  }
+
   extractUserFromPayload(payload: any) : User {
     return new User(
       payload.sub, 
