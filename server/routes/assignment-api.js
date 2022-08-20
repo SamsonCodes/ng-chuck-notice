@@ -1,11 +1,13 @@
 const express = require('express');
 const morgan = require('morgan');
+const isAuth = require('./authMiddleware').isAuth;
 
 const assignmentController = require('../controllers/assignmentController');
 
 const router = express.Router();
 
 router.use(morgan("combined"));
+router.use(isAuth);
 
 router.post('/', assignmentController.addOne);
 router.get('/', assignmentController.list);
