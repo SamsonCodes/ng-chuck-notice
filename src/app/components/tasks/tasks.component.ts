@@ -196,11 +196,6 @@ export class TasksComponent implements OnInit {
     }
   }
 
-  logger(){
-    console.log(this.taskForm.value);
-    console.log(this.newTask);
-  }
-
   isManager(): boolean {
     return this.authService.isManager();
   }
