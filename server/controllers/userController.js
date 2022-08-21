@@ -98,19 +98,30 @@ module.exports.deleteOne = function(req, res){
 }
 
 function unpackUserData(req){
-    const saltHash = genPassword(req.body.password);
+    if(req.body.password){
+        const saltHash = genPassword(req.body.password);
     
-    const salt = saltHash.salt;
-    const hash = saltHash.hash;
+        const salt = saltHash.salt;
+        const hash = saltHash.hash;
 
-    var userData = {
-        name: req.body.name,
-        hash: hash,
-        salt: salt,
-        userGroup: req.body.userGroup,
-        penalties: req.body.penalties
+        var userData = {
+            name: req.body.name,
+            hash: hash,
+            salt: salt,
+            userGroup: req.body.userGroup,
+            penalties: req.body.penalties
+        }
+        return userData;
     }
-    return userData;
+    else {
+        var userData = {
+            name: req.body.name,
+            userGroup: req.body.userGroup,
+            penalties: req.body.penalties
+        }
+        return userData;
+    }
+    
 }
 
 function handleError(err, res) {
