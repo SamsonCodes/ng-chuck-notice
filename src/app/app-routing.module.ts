@@ -12,8 +12,15 @@ import { IsAdminGuard } from './guards/is-admin.guard';
 import { IsAssignedGuard } from './guards/is-assigned.guard';
 
 const routes: Routes = [
-  { path: '', redirectTo: '/tasks', pathMatch: 'full'},
-  { path: 'login', component: LoginComponent},
+  { 
+    path: '', 
+    pathMatch: 'full',    
+    redirectTo: '/tasks'
+  },
+  { 
+    path: 'login', 
+    component: LoginComponent
+  },
   { 
     path: 'users', 
     component: UsersComponent,
