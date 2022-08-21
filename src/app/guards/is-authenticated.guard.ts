@@ -14,9 +14,8 @@ export class IsAuthenticatedGuard implements CanActivate {
   canActivate(
     route: ActivatedRouteSnapshot,
     state: RouterStateSnapshot): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
-    console.log('Auth Check');
+    
     if(this.authService.isLoggedOut()){
-      console.log('redirecting to login page')
       this.router.navigate(['login']);
     }
     return this.authService.isLoggedIn();

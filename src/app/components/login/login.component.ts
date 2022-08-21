@@ -43,7 +43,6 @@ export class LoginComponent implements OnInit {
       (response) => {
         // If the user authenticates successfully, we need to store the JWT returned in localStorage
         this.authService.setLocalStorage(response);
-
       },
 
       // If there is an error
