@@ -24,6 +24,7 @@ export class UsersComponent implements OnInit {
   defaultFormValues = {
     name: '',
     userGroup: '',
+    password: ''
   };
   userForm = this.formBuilder.group(this.defaultFormValues);  
   

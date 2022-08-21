@@ -34,5 +34,15 @@
             [(ngModel)]="this.selectedUser.penalties"
         >
     </div>
+    <div class="form-group">
+        <label for="passwordInput">Password</label>
+        <input 
+            required autofocus
+            minlength="3"
+            type="password" class="form-control"
+            id="passwordInput" formControlName="password" 
+            [(ngModel)]="this.selectedUser.password"
+        >
+      </div>
     <button *ngIf="userForm.valid" class="btn btn-lg btn-primary btn-block" type="submit">Edit User</button>        
 </form>

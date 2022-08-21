@@ -18,7 +18,8 @@ export class EditUserComponent implements OnInit {
   defaultFormValues = {
     name: '',
     userGroup: '',
-    penalties: 0
+    penalties: 0,
+    password: '' 
   }
   userForm = this.formBuilder.group(this.defaultFormValues);  
   
@@ -37,6 +38,7 @@ export class EditUserComponent implements OnInit {
     const id = this.route.snapshot.paramMap.get('id');
     this.userService.getUser(id!)
       .subscribe(user => {
+        console.log(user);
         this.selectedUser = user as User;  
     });
   }
