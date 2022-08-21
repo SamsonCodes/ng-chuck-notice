@@ -38,7 +38,6 @@ export class EditUserComponent implements OnInit {
     const id = this.route.snapshot.paramMap.get('id');
     this.userService.getUser(id!)
       .subscribe(user => {
-        console.log(user);
         this.selectedUser = user as User;  
     });
   }

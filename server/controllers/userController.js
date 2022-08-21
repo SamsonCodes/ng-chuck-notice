@@ -57,18 +57,22 @@ module.exports.list = function (req, res) {
             if (err) {
                 return handleError(err, res);
             }
-            res.json(results);
+            let safeResults = [];
+            results.forEach(user=>{
+                safeResults.push(safeUserData(user));
+            })
+            res.json(safeResults);
         });
 };
 
 module.exports.getOne = function (req, res) {
     User
         .findById(req.params.id)
-        .exec(function (err, User) {
+        .exec(function (err, user) {
             if (err) {
                 return handleError(err, res);
             }
-            res.json(User);
+            res.json(safeUserData(user));
         });
 };
 
@@ -114,5 +118,14 @@ function handleError(err, res) {
     res.statusCode = 500;
     res.end("Server error: " + err.toString());
     return res;
+}
+
+function safeUserData(user){
+    return {
+        _id: user._id,
+        name: user.name,
+        userGroup: user.userGroup,
+        penalties: user.penalties
+    }
 }
 
