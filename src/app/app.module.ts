@@ -11,7 +11,6 @@ import { AppRoutingModule } from './app-routing.module';
 import { TasksComponent } from './components/tasks/tasks.component';
 import { EditTaskComponent } from './components/edit-task/edit-task.component';
 import { LoginComponent } from './components/login/login.component';
-import { ProtectedComponent } from './components/protected/protected.component';
 import { AuthService } from './services/auth.service';
 import { AuthInterceptor } from './interceptors/auth.interceptor';
 
@@ -24,8 +23,7 @@ import { AuthInterceptor } from './interceptors/auth.interceptor';
     EditUserComponent,
     TasksComponent,
     EditTaskComponent,
-    LoginComponent,
-    ProtectedComponent
+    LoginComponent
   ],
   imports: [
     BrowserModule,

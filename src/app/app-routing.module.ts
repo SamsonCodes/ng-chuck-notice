@@ -6,10 +6,10 @@ import { UsersComponent } from './components/users/users.component';
 import { TasksComponent } from './components/tasks/tasks.component';
 import { EditTaskComponent } from './components/edit-task/edit-task.component';
 import { LoginComponent } from './components/login/login.component';
-import { ProtectedComponent as ProtectedComponent } from './components/protected/protected.component';
 import { IsAuthenticatedGuard } from './guards/is-authenticated.guard';
 import { IsAdminGuard } from './guards/is-admin.guard';
 import { IsAssignedGuard } from './guards/is-assigned.guard';
+import { ExampleTableComponent } from './components/example-table/example-table.component';
 
 const routes: Routes = [
   { 
@@ -40,11 +40,10 @@ const routes: Routes = [
     path: 'edit-task/:id', 
     component: EditTaskComponent,
     canActivate: [IsAuthenticatedGuard, IsAssignedGuard]
-  },  
+  },
   { 
-    path: 'protected', 
-    component: ProtectedComponent,
-    canActivate: [IsAuthenticatedGuard]
+    path: 'example-table', 
+    component: ExampleTableComponent
   }
 ];
 

@@ -1,20 +1,20 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { ProtectedComponent } from './protected.component';
+import { ExampleTableComponent } from './example-table.component';
 
-describe('ProtectedComponent', () => {
-  let component: ProtectedComponent;
-  let fixture: ComponentFixture<ProtectedComponent>;
+describe('ExampleTableComponent', () => {
+  let component: ExampleTableComponent;
+  let fixture: ComponentFixture<ExampleTableComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ ProtectedComponent ]
+      declarations: [ ExampleTableComponent ]
     })
     .compileComponents();
   });
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(ProtectedComponent);
+    fixture = TestBed.createComponent(ExampleTableComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
