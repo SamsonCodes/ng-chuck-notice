@@ -1,6 +1,35 @@
-<h1>Login Page</h1>
-<form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
-    Enter Username:<br><input type="text" formControlName="name">
-    <br>Enter Password:<br><input type="password" formControlName="password">
-    <br><br><input type="submit" value="Submit">
+<h1>Login Page</h1>    
+<form [formGroup]="loginForm" (ngSubmit)="onSubmit()" (change)="logger()">
+    <div class="form-group">
+        <label for="nameInput">Username:</label>
+        <input 
+            required autofocus
+            minlength="3"
+            type="text" class="form-control"
+            id="nameInput" formControlName="name"
+        >         
+        <div class="alert" *ngIf="(loginForm.controls.name.touched && loginForm.controls.name.errors?.required)">
+            Name is required.
+        </div>   
+        <div class="alert" *ngIf="(loginForm.controls.name.touched && loginForm.controls.name.errors?.minlength)">
+            Name must be at least 3 characters long.
+        </div> 
+    </div>    
+    <div class="form-group">
+        <label for="passwordInput">Password:</label>
+        <input 
+            required
+            minlength="3"
+            type="password" class="form-control"
+            id="passwordInput" formControlName="password"
+        > 
+        <div class="alert" *ngIf="(loginForm.controls.password.touched && loginForm.controls.password.errors?.required)">
+            Password is required.
+        </div>   
+        <div class="alert" *ngIf="(loginForm.controls.password.touched && loginForm.controls.password.errors?.minlength)">
+            Password must be at least 3 characters long.
+        </div>   
+    </div>
+    <input type="submit" value="Submit">
 </form>
+<p *ngIf="message">{{message}}</p>

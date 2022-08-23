@@ -23,15 +23,17 @@ import { AuthService } from 'src/app/services/auth.service';
 export class TasksComponent implements OnInit {
   tasks: Task[] = [];
 
-  newTask = {
+  defaultValues = {
     _id: '',
     title: 'Title',
-    description: 'Description',
+    description: '',
     deadline: '',
     status: 'open',    
     created_by: '62e3e215e4c239fe3041682c',
     created_on: ''
-  } as Task;
+  }
+
+  newTask = Object.assign({}, this.defaultValues) as Task;
 
   taskForm = this.fb.group({
     title: this.newTask.title,
@@ -142,15 +144,7 @@ export class TasksComponent implements OnInit {
   }
 
   resetForm(){
-    this.newTask = {
-      _id: '',
-      title: 'Title',
-      description: 'Description',
-      deadline: '',
-      status: 'open',    
-      created_by: '62e3e215e4c239fe3041682c',
-      created_on: ''
-    } as Task;
+    this.newTask = Object.assign({}, this.defaultValues) as Task;
   
     this.taskForm = this.fb.group({
       title: this.newTask.title,

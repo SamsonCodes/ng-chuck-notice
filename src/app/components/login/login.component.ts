@@ -14,6 +14,7 @@ export class LoginComponent implements OnInit {
     name: '',
     password: '',
   };
+  message = '';
   loginForm = this.formBuilder.group(this.defaultFormValues);
 
   constructor(
@@ -27,6 +28,7 @@ export class LoginComponent implements OnInit {
   }
 
   onSubmit(): void {
+    this.message = 'Sending login info...';
     const username = this.loginForm.value.name;
     const password = this.loginForm.value.password;
 
@@ -48,6 +50,11 @@ export class LoginComponent implements OnInit {
       // If there is an error
       (error) => {
         console.log(error);
+        if(error.status==401){
+          this.message = "Invalid username/password."
+        } else {
+          this.message = "Something went wrong on the server."
+        }
       },
       
       // When observable completes
@@ -59,4 +66,7 @@ export class LoginComponent implements OnInit {
     );
   }
 
+  logger(){
+    console.log(this.loginForm);
+  }
 }

@@ -24,7 +24,7 @@ export class UsersComponent implements OnInit {
   defaultFormValues = {
     name: '',
     userGroup: '',
-    password: ''
+    password: '1234'
   };
   userForm = this.formBuilder.group(this.defaultFormValues);  
   
@@ -58,5 +58,6 @@ export class UsersComponent implements OnInit {
 
   resetForm(){
     this.userForm.setValue(this.defaultFormValues);
+    this.userForm.reset(this.userForm.value);
   }
 }

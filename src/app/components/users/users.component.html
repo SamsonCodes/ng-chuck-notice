@@ -8,8 +8,14 @@
             type="text" class="form-control"
             id="nameInput" formControlName="name" 
             [(ngModel)]="this.newUser.name"
-        >
-    </div>
+        >    
+        <div class="alert" *ngIf="(userForm.controls.name.touched && userForm.controls.name.errors?.required)">
+          Name is required.
+        </div>   
+        <div class="alert" *ngIf="(userForm.controls.name.touched && userForm.controls.name.errors?.minlength)">
+            Name must be at least 3 characters long.
+        </div>     
+    </div>    
     <div class="form-group">
         <label for="groupInput">User Group</label>
         <select 
@@ -23,6 +29,9 @@
           <option value="employees">Employee</option>
           <option value="rh-kicked">Roundhouse Kicked</option>
         </select>
+        <div class="alert" *ngIf="(userForm.controls.userGroup.touched && userForm.controls.userGroup.errors?.required)">
+          UserGroup is required.
+        </div>
     </div>
     <div class="form-group">
       <label for="passwordInput">Password</label>
