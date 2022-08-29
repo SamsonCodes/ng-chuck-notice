@@ -42,6 +42,12 @@
           id="passwordInput" formControlName="password" 
           [(ngModel)]="this.newUser.password"
       >
+      <div class="alert" *ngIf="(userForm.controls.password.touched && userForm.controls.password.errors?.required)">
+        Password is required.
+      </div>  
+      <div class="alert" *ngIf="(userForm.controls.password.touched && userForm.controls.password.errors?.minlength)">
+        Password must be at least 3 characters long.
+    </div> 
     </div>
     <button *ngIf="userForm.valid" class="btn btn-lg btn-primary btn-block" type="submit">Add User</button>        
 </form>
