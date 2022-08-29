@@ -1,10 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import { ColumnMode } from '@swimlane/ngx-datatable';
 
 @Component({
   selector: 'app-example-table',
   templateUrl: './example-table.component.html',
-  styleUrls: ['./example-table.component.css','./example-table.component.scss']
+  styleUrls: ['./example-table.component.css']
 })
 export class ExampleTableComponent implements OnInit {
   exrows = [
@@ -14,7 +13,7 @@ export class ExampleTableComponent implements OnInit {
   ];
   rows:any[] = []
   columns = [{ prop: 'name' }, { name: 'Gender' }, { name: 'Company' }];
-  ColumnMode = ColumnMode;
+  
   constructor() { }
 
   ngOnInit(): void {
