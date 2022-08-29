@@ -13,7 +13,8 @@ import { EditTaskComponent } from './components/edit-task/edit-task.component';
 import { LoginComponent } from './components/login/login.component';
 import { AuthService } from './services/auth.service';
 import { AuthInterceptor } from './interceptors/auth.interceptor';
-
+import { NgxDatatableModule } from '@swimlane/ngx-datatable';
+import { ExampleTableComponent } from './components/example-table/example-table.component';
 
 @NgModule({
   declarations: [
@@ -23,14 +24,16 @@ import { AuthInterceptor } from './interceptors/auth.interceptor';
     EditUserComponent,
     TasksComponent,
     EditTaskComponent,
-    LoginComponent
+    LoginComponent,
+    ExampleTableComponent
   ],
   imports: [
     BrowserModule,
     FormsModule,
     ReactiveFormsModule,
     HttpClientModule,
-    AppRoutingModule
+    AppRoutingModule,
+    NgxDatatableModule
   ],
   providers: [
     AuthService,
