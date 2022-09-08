@@ -1,2 +1,18 @@
-
-  
+<div>
+  <table id="myTable" class="table table-striped">
+    <thead>
+      <tr>
+        <th scope="col" *ngFor="let column of columns;">
+          {{column}}
+        </th>
+      </tr>   
+    </thead>
+    <tbody>
+      <tr *ngFor="let row of rows">
+        <td>{{row.name}}</td>
+        <td>{{row.gender}}</td>
+        <td>{{row.company}}</td>
+      </tr> 
+    </tbody> 
+  </table>
+</div>

@@ -12,7 +12,7 @@ export class ExampleTableComponent implements OnInit {
     { name: 'Molly', gender: 'Female', company: 'Burger King' }
   ];
   rows:any[] = []
-  columns = [{ prop: 'name' }, { name: 'Gender' }, { name: 'Company' }];
+  columns = ['name','Gender', 'Company' ];
   
   constructor() { }
 
