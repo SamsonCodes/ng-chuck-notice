@@ -1,0 +1,9 @@
+table {
+    width: 100%;
+}
+
+.mat-column-symbol {
+    width: 32px;
+    text-align: center;
+    font-weight: bold;
+  }

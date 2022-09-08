@@ -2,6 +2,10 @@ import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { MatButtonModule } from '@angular/material/button';
+import {MatTableModule} from '@angular/material/table';
+import { MatPaginatorModule } from '@angular/material/paginator';
 
 import { AppRoutingModule } from './app-routing.module';
 
@@ -16,6 +20,7 @@ import { ExampleTableComponent } from './components/example-table/example-table.
 
 import { AuthService } from './services/auth.service';
 import { AuthInterceptor } from './interceptors/auth.interceptor';
+
 
 @NgModule({
   declarations: [
@@ -33,7 +38,11 @@ import { AuthInterceptor } from './interceptors/auth.interceptor';
     FormsModule,
     ReactiveFormsModule,
     HttpClientModule,
-    AppRoutingModule
+    AppRoutingModule,
+    BrowserAnimationsModule,
+    MatButtonModule,
+    MatTableModule,
+    MatPaginatorModule
   ],
   providers: [
     AuthService,
