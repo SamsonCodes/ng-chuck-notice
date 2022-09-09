@@ -1,5 +1,8 @@
 
 <div>
+  <label for="filterInput">Filter:</label>
+  <input id="filterInput" name="filter" type="text" [(ngModel)]="filterInput" (change)="onFilterChange()">
+  
   <table mat-table [dataSource]="dataSource" class="mat-elevation-z8" matSort>
 
     <!--- Note that these columns can be defined in any order.

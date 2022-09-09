@@ -34,6 +34,8 @@ export class ExampleTableComponent implements AfterViewInit {
 
   @ViewChild(MatPaginator) paginator: any = MatPaginator;
   @ViewChild(MatSort) sort: any = MatSort;
+
+  filterInput: string = "";
   
   constructor() { }
 
@@ -42,4 +44,10 @@ export class ExampleTableComponent implements AfterViewInit {
     this.dataSource.sort = this.sort;
   }
 
+  onFilterChange() {
+    console.log(this.filterInput);
+    let filterValue = this.filterInput.trim();
+    filterValue = filterValue.toLowerCase();
+    this.dataSource.filter = filterValue;
+  }
 }
