@@ -75,7 +75,10 @@
     <button *ngIf="taskForm.valid" class="btn btn-lg btn-primary btn-block" type="submit">Add Task</button>    
            
 </form>
-<table mat-table [dataSource]="dataSource" class="mat-elevation-z8" matSort (matSortChange)="announceSortChange($event)">
+<div class="table-div">
+    <label for="filterInput">Filter:</label>
+    <input id="filterInput" name="filter" type="text" [(ngModel)]="filterInput" (change)="onFilterChange()">
+    <table mat-table [dataSource]="dataSource" class="mat-elevation-z8" matSort (matSortChange)="announceSortChange($event)">
     <!-- Title Column -->
     <ng-container matColumnDef="title">
         <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by title"> Title </th>
@@ -121,8 +124,10 @@
 
     <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
     <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-</table>
-<mat-paginator [pageSizeOptions]="[5, 10, 20]"
-    showFirstLastButtons 
-    aria-label="Select page of tasks">
-</mat-paginator>
+    </table>
+    <mat-paginator [pageSizeOptions]="[5, 10, 20]"
+        showFirstLastButtons 
+        aria-label="Select page of tasks">
+    </mat-paginator>
+</div>
+

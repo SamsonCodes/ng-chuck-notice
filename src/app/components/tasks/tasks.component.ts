@@ -57,6 +57,8 @@ export class TasksComponent implements OnInit, AfterViewInit {
 
   displayedColumns: string[] = ['title', 'description', 'deadline', 'status', 'created_on', 'actions'];
   dataSource = new MatTableDataSource<Task>([]);
+
+  filterInput: string = "";
   
   constructor(
     private taskService: TaskService,
@@ -225,5 +227,12 @@ export class TasksComponent implements OnInit, AfterViewInit {
     } else {
       this._liveAnnouncer.announce('Sorting cleared');
     }
+  }
+
+  onFilterChange() {
+    console.log(this.filterInput);
+    let filterValue = this.filterInput.trim();
+    filterValue = filterValue.toLowerCase();
+    this.dataSource.filter = filterValue;
   }
 }

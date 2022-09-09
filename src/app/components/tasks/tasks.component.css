@@ -6,3 +6,7 @@ table {
 th.mat-sort-header-sorted {
     color: black;
 }
+
+.table-div {
+    margin-top: 10px;
+}
