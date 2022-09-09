@@ -1,0 +1,12 @@
+table {
+    margin-top: 5px;
+    width: 100%;
+}
+
+th.mat-sort-header-sorted {
+    color: black;
+}
+
+.table-div {
+    margin-top: 10px;
+}
