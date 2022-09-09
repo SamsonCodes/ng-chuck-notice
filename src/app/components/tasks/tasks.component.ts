@@ -1,5 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormArray, FormBuilder } from '@angular/forms';
+import { MatPaginator } from '@angular/material/paginator';
+import { MatSort } from '@angular/material/sort';
+
 import { Observable, combineLatest } from 'rxjs';
 import { defaultIfEmpty, switchMap } from 'rxjs/operators';
 
@@ -13,6 +16,8 @@ import { AssignmentService } from 'src/app/services/assignment.service';
 import { Dependency } from 'src/app/classes/dependency';
 import { DependencyService } from 'src/app/services/dependency.service';
 import { AuthService } from 'src/app/services/auth.service';
+import { MatTableDataSource } from '@angular/material/table';
+
 
 @Component({
   selector: 'tasks',
@@ -45,6 +50,12 @@ export class TasksComponent implements OnInit {
   });
 
   allUsers: User[] = [];
+
+  @ViewChild(MatPaginator) paginator: any = MatPaginator;
+  @ViewChild(MatSort) sort: any = MatSort;
+
+  displayedColumns: string[] = ['Title', 'Description', 'Deadline', 'Status', 'Created On', 'Actions'];
+  dataSource = new MatTableDataSource<Task>([]);
   
   constructor(
     private taskService: TaskService,
@@ -76,6 +87,7 @@ export class TasksComponent implements OnInit {
     else{
       this.taskService.getTasks().subscribe((res) => {
         this.tasks = res as Task[];
+        this.dataSource.data = this.tasks;
       });
     }    
   }
