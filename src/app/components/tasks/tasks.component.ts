@@ -2,6 +2,8 @@ import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
 import { FormArray, FormBuilder } from '@angular/forms';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort, Sort } from '@angular/material/sort';
+import { MatTableDataSource } from '@angular/material/table';
+import { LiveAnnouncer } from '@angular/cdk/a11y';
 
 import { Observable, combineLatest } from 'rxjs';
 import { defaultIfEmpty, switchMap } from 'rxjs/operators';
@@ -16,8 +18,7 @@ import { AssignmentService } from 'src/app/services/assignment.service';
 import { Dependency } from 'src/app/classes/dependency';
 import { DependencyService } from 'src/app/services/dependency.service';
 import { AuthService } from 'src/app/services/auth.service';
-import { MatTableDataSource } from '@angular/material/table';
-import { LiveAnnouncer } from '@angular/cdk/a11y';
+
 
 
 @Component({
