@@ -1,7 +1,7 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
 import { FormArray, FormBuilder } from '@angular/forms';
 import { MatPaginator } from '@angular/material/paginator';
-import { MatSort } from '@angular/material/sort';
+import { MatSort, Sort } from '@angular/material/sort';
 
 import { Observable, combineLatest } from 'rxjs';
 import { defaultIfEmpty, switchMap } from 'rxjs/operators';
@@ -17,6 +17,7 @@ import { Dependency } from 'src/app/classes/dependency';
 import { DependencyService } from 'src/app/services/dependency.service';
 import { AuthService } from 'src/app/services/auth.service';
 import { MatTableDataSource } from '@angular/material/table';
+import { LiveAnnouncer } from '@angular/cdk/a11y';
 
 
 @Component({
@@ -25,7 +26,7 @@ import { MatTableDataSource } from '@angular/material/table';
   styleUrls: ['./tasks.component.css'],
   providers: [TaskService]
 })
-export class TasksComponent implements OnInit {
+export class TasksComponent implements OnInit, AfterViewInit {
   tasks: Task[] = [];
 
   defaultValues = {
@@ -54,7 +55,7 @@ export class TasksComponent implements OnInit {
   @ViewChild(MatPaginator) paginator: any = MatPaginator;
   @ViewChild(MatSort) sort: any = MatSort;
 
-  displayedColumns: string[] = ['Title', 'Description', 'Deadline', 'Status', 'Created On', 'Actions'];
+  displayedColumns: string[] = ['title', 'description', 'deadline', 'status', 'created_on', 'actions'];
   dataSource = new MatTableDataSource<Task>([]);
   
   constructor(
@@ -63,8 +64,14 @@ export class TasksComponent implements OnInit {
     private assignmentService: AssignmentService,
     private dependencyService: DependencyService,
     private fb: FormBuilder,
-    private authService: AuthService
+    private authService: AuthService,
+    private _liveAnnouncer: LiveAnnouncer
   ) {}
+
+  ngAfterViewInit() {
+    this.dataSource.paginator = this.paginator;
+    this.dataSource.sort = this.sort;
+  }
 
   ngOnInit(): void {
     this.refreshTaskList();
@@ -88,6 +95,7 @@ export class TasksComponent implements OnInit {
       this.taskService.getTasks().subscribe((res) => {
         this.tasks = res as Task[];
         this.dataSource.data = this.tasks;
+        console.log(this.dataSource)
       });
     }    
   }
@@ -204,5 +212,18 @@ export class TasksComponent implements OnInit {
 
   isManager(): boolean {
     return this.authService.isManager();
+  }
+
+  /** Announce the change in sort state for assistive technology. */
+  announceSortChange(sortState: Sort) {
+    // This example uses English messages. If your application supports
+    // multiple language, you would internationalize these strings.
+    // Furthermore, you can customize the message to add additional
+    // details about the values being sorted.
+    if (sortState.direction) {
+      this._liveAnnouncer.announce(`Sorted ${sortState.direction}ending`);
+    } else {
+      this._liveAnnouncer.announce('Sorting cleared');
+    }
   }
 }
