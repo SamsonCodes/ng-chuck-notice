@@ -10,7 +10,7 @@ import { defaultIfEmpty, switchMap } from 'rxjs/operators';
 
 import { TaskService } from '../../services/task.service';
 import { Task } from '../../classes/task';
-import { convertToDateString } from '../../dateHelper';
+import { convertToDateString } from '../../helpers/dateHelper';
 import { User } from 'src/app/classes/user';
 import { UserService } from 'src/app/services/user.service';
 import { Assignment } from 'src/app/classes/assignment';
