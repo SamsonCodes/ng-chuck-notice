@@ -27,6 +27,33 @@ mongoose.connect(db_url, {
   }
 });
 
+setInterval(checkDeadlines, 3000);
+
+function checkDeadlines(){
+  function convertToDateString(dateObject){
+    var dd = String(dateObject.getDate()).padStart(2, '0');
+    var mm = String(dateObject.getMonth() + 1).padStart(2, '0'); //January is 0!
+    var yyyy = dateObject.getFullYear();
+  
+    var dateString = yyyy + '-' + mm + '-' + dd;
+    return dateString;
+  }
+  console.log('Checking deadlines');
+  let today = new Date();
+  let todayString = convertToDateString(today);
+  console.log(todayString); 
+  const Task = require('./server/models/task');
+  Task
+    .find({deadline: {$lte: todayString, $ne: ''}})
+    .exec(function (err, overdueTasks) {
+        if (err) {
+          console.log(err);
+        } else {
+          console.log(overdueTasks.length);
+        }        
+    });
+}
+
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(cors({origin: 'http://localhost:4200'}));
