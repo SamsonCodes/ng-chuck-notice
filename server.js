@@ -27,7 +27,13 @@ mongoose.connect(db_url, {
   }
 });
 
-setInterval(checkDeadlines, 3000);
+// setInterval(checkDeadlines, 5000000);
+checkDeadlines();
+// const User = require('./server/models/user');
+// User.findById('6300c9c8e23f7e31024646aa').exec(function(err, user){
+//   console.log(user);
+// })
+
 
 function checkDeadlines(){
   function convertToDateString(dateObject){
@@ -40,18 +46,53 @@ function checkDeadlines(){
   }
   console.log('Checking deadlines');
   let today = new Date();
+  today.setDate(today.getDate() - 1);
   let todayString = convertToDateString(today);
   console.log(todayString); 
-  const Task = require('./server/models/task');
+  const Task = require('./server/models/task');  
   Task
     .find({deadline: {$lte: todayString, $ne: ''}})
-    .exec(function (err, overdueTasks) {
+    .exec(async function (err, overdueTasks) {
         if (err) {
           console.log(err);
-        } else {
-          console.log(overdueTasks.length);
+        } else {  
+          console.log('overdue tasks:', overdueTasks.length);
+          for(const overdueTask of overdueTasks) {
+            const result = await penalizeAssignedUsers(overdueTask);
+            console.log(overdueTask.title, result);
+          }
+          // doTheThing(overdueTasks);
+          // overdueTasks.forEach(async overdueTask=>{
+          //   const result = await penalizeAssignedUsers(overdueTask);
+          //   console.log(overdueTask.title, result);
+          // })
         }        
     });
+}
+
+function penalizeAssignedUsers(overdueTask){
+  const Assignment = require('./server/models/assignment');
+  const User = require('./server/models/user');
+  let promise = new Promise(function(resolve, reject){
+    Assignment.find({task_id: overdueTask._id}).exec(function(err, assignments){
+      userCalls = [];
+      assignments.forEach(assignment => {
+        userCalls.push(User.findById(assignment.user_id))
+      })
+      Promise.all(userCalls).then(users=>{
+        let names = [];
+        let penalties = [];
+        users.forEach(user=>{
+          user.penalties += 1;
+          user.save();
+          names.push(user.name);
+          penalties.push(user.penalties);
+        })
+        resolve([names, penalties]);
+      })      
+    })
+  })
+  return promise;
 }
 
 app.use(bodyParser.urlencoded({ extended: false }));
