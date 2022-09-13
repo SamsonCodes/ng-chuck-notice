@@ -27,13 +27,8 @@ mongoose.connect(db_url, {
   }
 });
 
-// setInterval(checkDeadlines, 5000000);
 checkDeadlines();
-// const User = require('./server/models/user');
-// User.findById('6300c9c8e23f7e31024646aa').exec(function(err, user){
-//   console.log(user);
-// })
-
+setInterval(checkDeadlines, 24*60*1000);
 
 function checkDeadlines(){
   function convertToDateString(dateObject){
@@ -46,12 +41,12 @@ function checkDeadlines(){
   }
   console.log('Checking deadlines');
   let today = new Date();
-  today.setDate(today.getDate() - 1);
+  today.setDate(today.getDate() - 2);
   let todayString = convertToDateString(today);
   console.log(todayString); 
   const Task = require('./server/models/task');  
   Task
-    .find({deadline: {$lte: todayString, $ne: ''}})
+    .find({deadline: {$lt: todayString, $ne: ''}})
     .exec(async function (err, overdueTasks) {
         if (err) {
           console.log(err);
@@ -60,12 +55,9 @@ function checkDeadlines(){
           for(const overdueTask of overdueTasks) {
             const result = await penalizeAssignedUsers(overdueTask);
             console.log(overdueTask.title, result);
+            overdueTask.deadline = 'OVERDUE';
+            overdueTask.save();
           }
-          // doTheThing(overdueTasks);
-          // overdueTasks.forEach(async overdueTask=>{
-          //   const result = await penalizeAssignedUsers(overdueTask);
-          //   console.log(overdueTask.title, result);
-          // })
         }        
     });
 }
