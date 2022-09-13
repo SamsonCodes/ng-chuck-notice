@@ -76,7 +76,7 @@ export class TasksComponent implements OnInit, AfterViewInit {
     this.dataSource.sort = this.sort;
   }
 
-  ngOnInit(): void {
+  ngOnInit(): void {    
     this.refreshTaskList();
     this.getAllUsers();
   }
@@ -98,7 +98,6 @@ export class TasksComponent implements OnInit, AfterViewInit {
       this.taskService.getTasks().subscribe((res) => {
         this.tasks = res as Task[];
         this.dataSource.data = this.tasks;
-        console.log(this.dataSource)
       });
     }    
   }
