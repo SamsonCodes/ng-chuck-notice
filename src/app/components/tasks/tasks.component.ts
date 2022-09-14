@@ -92,14 +92,16 @@ export class TasksComponent implements OnInit, AfterViewInit {
       let userId = this.authService.getUser()!._id;
       this.taskService.getUserTasks(userId).subscribe((res) => {
         this.tasks = res as Task[];
+        this.dataSource.data = this.tasks;
       });
     }
     else{
       this.taskService.getTasks().subscribe((res) => {
-        this.tasks = res as Task[];
-        this.dataSource.data = this.tasks;
+        this.tasks = res as Task[];      
+        this.dataSource.data = this.tasks;  
       });
-    }    
+    }  
+
   }
 
   onSubmit(){        
