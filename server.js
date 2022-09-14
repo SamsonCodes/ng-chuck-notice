@@ -43,7 +43,7 @@ function checkDeadlines(){
   }
   console.log('Checking deadlines');
   let today = new Date();
-  today.setDate(today.getDate() - 2);
+  today.setDate(today.getDate());
   let todayString = convertToDateString(today);
   console.log(todayString); 
   const Task = require('./server/models/task');  
