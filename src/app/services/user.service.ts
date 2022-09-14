@@ -36,7 +36,8 @@ export class UserService {
   deleteUser(userId: string): Observable<void> {
     let observable = new Observable<void>(subscriber=>{
       this.deleteAssignments(userId).subscribe(()=>{
-        this.http.delete(this.usersUrl + `/${userId}`).subscribe(()=>{
+        this.http.delete(this.usersUrl + `/${userId}`).subscribe((response)=>{
+          console.log(response);
           subscriber.next();
         });
       })

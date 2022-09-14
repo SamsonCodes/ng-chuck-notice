@@ -89,12 +89,25 @@ module.exports.updateOne = function(req, res){
 
 //DELETE
 module.exports.deleteOne = function(req, res){ 
-    User.findByIdAndDelete(req.params.id, (err, doc) => {
-        if(!err){ res.send(doc);}
-        else {
-            return handleError(err, res);
-        }
-    })
+    User
+        .findById(req.params.id)
+        .exec(function (err, user) {
+            if (err) {
+                return handleError(err, res);
+            }
+            if(user.userGroup != 'admins'){
+                User.findByIdAndDelete(req.params.id, (err, doc) => {
+                    if(!err){ res.send(doc);}
+                    else {
+                        return handleError(err, res);
+                    }
+                })
+            }
+            else{
+                res.json({msg: 'Not allowed to delete admins.'}); //To avoid accidental deleting of this admins. If you want to delete change userGroup first.
+            }
+        });
+    
 }
 
 function unpackUserData(req){
