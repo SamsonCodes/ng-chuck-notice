@@ -17,11 +17,11 @@ import { EditUserComponent } from './components/edit-user/edit-user.component';
 import { TasksComponent } from './components/tasks/tasks.component';
 import { EditTaskComponent } from './components/edit-task/edit-task.component';
 import { LoginComponent } from './components/login/login.component';
-import { ExampleTableComponent } from './components/example-table/example-table.component';
 
 import { AuthService } from './services/auth.service';
 import { AuthInterceptor } from './interceptors/auth.interceptor';
 import { KickedPageComponent } from './components/kicked-page/kicked-page.component';
+import { AboutPageComponent } from './components/about-page/about-page.component';
 
 
 @NgModule({
@@ -33,8 +33,8 @@ import { KickedPageComponent } from './components/kicked-page/kicked-page.compon
     TasksComponent,
     EditTaskComponent,
     LoginComponent,
-    ExampleTableComponent,
-    KickedPageComponent
+    KickedPageComponent,
+    AboutPageComponent
   ],
   imports: [
     BrowserModule,

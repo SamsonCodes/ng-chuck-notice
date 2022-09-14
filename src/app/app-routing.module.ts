@@ -9,9 +9,9 @@ import { LoginComponent } from './components/login/login.component';
 import { IsAuthenticatedGuard } from './guards/is-authenticated.guard';
 import { IsAdminGuard } from './guards/is-admin.guard';
 import { IsAssignedGuard } from './guards/is-assigned.guard';
-import { ExampleTableComponent } from './components/example-table/example-table.component';
 import { NotKickedGuard } from './guards/not-kicked.guard';
 import { KickedPageComponent } from './components/kicked-page/kicked-page.component';
+import { AboutPageComponent } from './components/about-page/about-page.component';
 
 const routes: Routes = [
   { 
@@ -44,9 +44,8 @@ const routes: Routes = [
     canActivate: [IsAuthenticatedGuard, IsAssignedGuard, NotKickedGuard]
   },
   { 
-    path: 'example-table', 
-    component: ExampleTableComponent,
-    canActivate: [NotKickedGuard]
+    path: 'about-page', 
+    component: AboutPageComponent
   },
   { 
     path: 'kicked', 

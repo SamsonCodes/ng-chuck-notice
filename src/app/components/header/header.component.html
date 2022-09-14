@@ -13,17 +13,14 @@
         <li *ngIf="!currentUser" class="nav-item">
           <a class="nav-link" routerLink="/login">Login</a>
         </li>
-        <li *ngIf="currentUser" class="nav-item">
-          <a class="nav-link" href="">About</a>
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/about-page">About</a>
         </li>        
         <li *ngIf="currentUser" class="nav-item">
           <a class="nav-link" routerLink="/tasks">Tasks</a>
         </li>
         <li *ngIf="isAdmin()" class="nav-item">
           <a class="nav-link" routerLink="/users">Users</a>
-        </li>
-        <li *ngIf="currentUser" class="nav-item">
-          <a class="nav-link" routerLink="/example-table">Example Table</a>
         </li>
         <!-- <li class="nav-item">
           <a class="nav-link disabled" href="#">Disabled</a>
