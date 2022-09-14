@@ -21,6 +21,7 @@ import { ExampleTableComponent } from './components/example-table/example-table.
 
 import { AuthService } from './services/auth.service';
 import { AuthInterceptor } from './interceptors/auth.interceptor';
+import { KickedPageComponent } from './components/kicked-page/kicked-page.component';
 
 
 @NgModule({
@@ -32,7 +33,8 @@ import { AuthInterceptor } from './interceptors/auth.interceptor';
     TasksComponent,
     EditTaskComponent,
     LoginComponent,
-    ExampleTableComponent
+    ExampleTableComponent,
+    KickedPageComponent
   ],
   imports: [
     BrowserModule,
