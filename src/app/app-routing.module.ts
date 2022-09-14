@@ -50,7 +50,8 @@ const routes: Routes = [
   },
   { 
     path: 'kicked', 
-    component: KickedPageComponent
+    component: KickedPageComponent,
+    canActivate: [IsAuthenticatedGuard]
   }
 ];
 
