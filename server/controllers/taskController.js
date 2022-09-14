@@ -74,7 +74,7 @@ function unpackTaskData(req){
 function handleError(err, res) {
     console.log(err.toString());
     res.statusCode = 500;
-    res.end("Server error: " + err.toString());
+    res.send("Server error: " + err.toString());
     return res;
 }
 
