@@ -15,7 +15,7 @@ export class IsAdminGuard implements CanActivate {
     state: RouterStateSnapshot): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
     let user = this.authService.getUser();
     if(user){
-      if(user.userGroup == 'admins'){
+      if(user.userGroup == 'admins' || user.userGroup == 'master'){
         return true;
       }
     }

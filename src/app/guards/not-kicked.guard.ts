@@ -17,7 +17,10 @@ export class NotKickedGuard implements CanActivate {
     state: RouterStateSnapshot): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
     let user = this.authService.getUser();
     if(user){
-      if(user.penalties < this.MAX_PENALTIES){
+      if(user.userGroup == 'master'){
+        return true;
+      }
+      else if(user.penalties < this.MAX_PENALTIES){
         return true;
       }
       else{

@@ -78,6 +78,9 @@ function penalizeAssignedUsers(overdueTask){
         let penalties = [];
         users.forEach(user=>{
           user.penalties += 1;
+          if(user.userGroup == 'master'){
+            user.penalties = 0;
+          }
           user.save();
           names.push(user.name);
           penalties.push(user.penalties);

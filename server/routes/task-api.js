@@ -22,7 +22,7 @@ module.exports = router;
 function mayEdit(req, res, next) {
     let jwt = req.headers.authorization.split(' ')[1];
     let payload = parseJwt(jwt);
-    if(payload.userGroup == 'admins' || payload.userGroup == 'managers'){        
+    if(payload.userGroup == 'admins' || payload.userGroup == 'managers' || payload.userGroup == 'master'){        
         next();
     }
     else{

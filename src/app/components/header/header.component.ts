@@ -28,6 +28,6 @@ export class HeaderComponent implements OnInit {
     if(!this.currentUser){
       return false;
     }
-    return this.currentUser.userGroup == "admins";
+    return this.currentUser.userGroup == "admins" || this.currentUser.userGroup == "master";
   }
 }

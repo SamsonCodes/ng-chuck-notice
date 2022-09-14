@@ -78,13 +78,26 @@ module.exports.getOne = function (req, res) {
 
 //UPDATE
 module.exports.updateOne = function(req, res){ 
-    var newUserData = unpackUserData(req);
-    User.findByIdAndUpdate(req.params.id, {$set : newUserData }, {new: true}, (err, doc) => {
-        if(!err){ res.send(doc);}
-        else {
-            return handleError(err, res);
-        }
-    })
+    User
+        .findById(req.params.id)
+        .exec(function (err, user) {
+            if (err) {
+                return handleError(err, res);
+            }
+            if(user.userGroup != 'master'){
+                var newUserData = unpackUserData(req);
+                User.findByIdAndUpdate(req.params.id, {$set : newUserData }, {new: true}, (err, doc) => {
+                    if(!err){ res.send(doc);}
+                    else {
+                        return handleError(err, res);
+                    }
+                })
+            }    
+            else{
+                res.json({msg: 'Not allowed to update master.'});
+            }        
+        });
+    
 }
 
 //DELETE
@@ -95,7 +108,7 @@ module.exports.deleteOne = function(req, res){
             if (err) {
                 return handleError(err, res);
             }
-            if(user.userGroup != 'admins'){
+            if(user.userGroup != 'master'){
                 User.findByIdAndDelete(req.params.id, (err, doc) => {
                     if(!err){ res.send(doc);}
                     else {
@@ -104,7 +117,7 @@ module.exports.deleteOne = function(req, res){
                 })
             }
             else{
-                res.json({msg: 'Not allowed to delete admins.'}); //To avoid accidental deleting of this admins. If you want to delete change userGroup first.
+                res.json({msg: 'Not allowed to delete master.'});
             }
         });
     
