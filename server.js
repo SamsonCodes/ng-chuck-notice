@@ -9,6 +9,7 @@ const userApi = require('./server/routes/user-api.js');
 const taskApi = require('./server/routes/task-api.js');
 const assignmentApi = require('./server/routes/assignment-api.js');
 const dependencyApi = require('./server/routes/dependency-api.js');
+const { AotCompiler } = require('@angular/compiler');
 
 require('dotenv').config();
 
@@ -28,7 +29,8 @@ mongoose.connect(db_url, {
 });
 
 checkDeadlines();
-setInterval(checkDeadlines, 24*60*1000);
+// setInterval(checkDeadlines, 24*60*60*1000); //every day
+setInterval(checkDeadlines, 60*1000); //every minute
 
 function checkDeadlines(){
   function convertToDateString(dateObject){
