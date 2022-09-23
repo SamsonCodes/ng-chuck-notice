@@ -59,7 +59,7 @@ module.exports.list = function (req, res) {
             }
             let safeResults = [];
             results.forEach(user=>{
-                safeResults.push(safeUserData(user));
+                safeResults.push(filterUserData(user));
             })
             res.json(safeResults);
         });
@@ -72,7 +72,7 @@ module.exports.getOne = function (req, res) {
             if (err) {
                 return handleError(err, res);
             }
-            res.json(safeUserData(user));
+            res.json(filterUserData(user));
         });
 };
 
@@ -157,7 +157,7 @@ function handleError(err, res) {
     return res;
 }
 
-function safeUserData(user){
+function filterUserData(user){
     return {
         _id: user._id,
         name: user.name,

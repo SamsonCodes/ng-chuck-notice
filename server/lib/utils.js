@@ -73,7 +73,17 @@ function parseJwt(token) {
   return JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString());
 }
 
+function convertToDateString(dateObject){
+  var dd = String(dateObject.getDate()).padStart(2, '0');
+  var mm = String(dateObject.getMonth() + 1).padStart(2, '0'); //January is 0!
+  var yyyy = dateObject.getFullYear();
+
+  var dateString = yyyy + '-' + mm + '-' + dd;
+  return dateString;
+}
+
 module.exports.validPassword = validPassword;
 module.exports.genPassword = genPassword;
 module.exports.issueJWT = issueJWT;
 module.exports.parseJwt = parseJwt;
+module.exports.convertToDateString = convertToDateString;
