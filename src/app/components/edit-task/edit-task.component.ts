@@ -30,19 +30,17 @@ export class EditTaskComponent implements OnInit {
     description: '',
     deadline: '',
     status: '',
-    assignments: this.fb.array([]),
-    dependencies: this.fb.array([])
+    formAssignments: this.fb.array([]),
+    formDependencies: this.fb.array([])
   });
 
   id: string = '';
   
   allUsers: User[] = [];
-  assignments: Assignment[] = [];  
-  assignedUsers: User[] = [];
+  assignments: Assignment[] = []; 
 
   otherTasks: Task[] = [];
   dependencies: Dependency[] = []; 
-  dependencyTasks: Task[] = [];
   
   constructor(
     private route: ActivatedRoute,
@@ -59,9 +57,9 @@ export class EditTaskComponent implements OnInit {
     this.getId();
     this.getTask();
     this.getAllUsers();
-    this.getAllTasks();
+    this.getOtherTasks();
     this.getAssignments();
-    this.getDependencies(); 
+    this.getDependencies();   
   }
 
   getId(): void {
@@ -82,7 +80,7 @@ export class EditTaskComponent implements OnInit {
     });
   }
 
-  getAllTasks(): void {
+  getOtherTasks(): void {
     this.taskService.getTasks().subscribe((res)=>{
       let allTasks = res as Task[];      
       this.otherTasks = allTasks.filter(task=>
@@ -93,72 +91,32 @@ export class EditTaskComponent implements OnInit {
 
   getAssignments(): void {    
     this.assignmentService.getTaskAssignments(this.id).subscribe((res)=>{
-      this.assignments = res as Array<Assignment>;   
-      this.getAssignedUsers();   
-      this.selectAssignments();
+      this.assignments = res as Array<Assignment>; 
+      for(let assignment of this.assignments){
+        this.formAssignments.push(this.fb.control(assignment.user_id));
+      }
     })
-  }
-
-  getAssignedUsers(): void {
-    this.assignedUsers = [];
-    this.assignments.forEach((assignment)=>{
-      this.allUsers.forEach((user)=>{
-        if(user._id == assignment.user_id){
-          this.assignedUsers.push(user);
-        }
-      })
-    })
-  }
-
-  selectAssignments(): void {
-    for(let assignment of this.assignments){
-      this.formAssignments.push(this.fb.control(assignment.user_id));
-    }
   }
 
   getDependencies(): void {
     this.dependencyService.getTaskDependencies(this.id).subscribe((res)=>{
-      this.dependencies = res as Array<Dependency>;   
-      this.getDependencyTasks();   
-      this.selectDependencies();
+      this.dependencies = res as Array<Dependency>; 
+      for(let dependency of this.dependencies){
+        this.formDependencies.push(this.fb.control(dependency.dependency_id));
+      }
     })
-  }
-
-  getDependencyTasks(): void {
-    this.dependencyTasks = [];
-    this.dependencies.forEach((dependency)=>{
-      this.otherTasks.forEach((task)=>{
-        if(task._id == dependency.dependency_id){
-          this.dependencyTasks.push(task);
-        }
-      })
-    })
-  }
-
-  selectDependencies(): void {
-    for(let dependency of this.dependencies){
-      this.formDependencies.push(this.fb.control(dependency.dependency_id));
-    }
   }
 
   onSubmit(): void {   
-    this.submitAssignments(this.taskForm.value.assignments);  
-    if(this.taskForm.value.dependencies.length > 0){
-      this.submitDependencies(this.taskForm.value.dependencies)
-        .pipe(
-          defaultIfEmpty(),
-        ).subscribe((res)=>{
-          this.taskService.putTask(this.selectedTask).subscribe(() => {
-            this.goBack();          
-        });
+    this.submitAssignments(this.taskForm.value.formAssignments);  
+    this.submitDependencies(this.taskForm.value.formDependencies)
+      .pipe(
+        defaultIfEmpty(),
+      ).subscribe(()=>{
+        this.taskService.putTask(this.selectedTask).subscribe(() => {
+          this.goBack();          
       });
-    }  
-    else{
-      this.taskService.putTask(this.selectedTask).subscribe(() => {
-        this.goBack();          
-      });
-    }
-           
+    });      
   }
 
   onDelete(): void {
@@ -168,34 +126,55 @@ export class EditTaskComponent implements OnInit {
   }
 
   submitAssignments(formAssignmentValues: Array<string>): void {   
-    let databaseAmount =  this.assignments.length;
+    let databaseAmount = this.assignments.length;
     let formAmount = formAssignmentValues.length;
 
-    let existingIndices = this.range(0, databaseAmount - 1);
+    let existingIndices = this.createRange(0, databaseAmount - 1);
     for(let i of existingIndices){
       if(formAssignmentValues[i] != this.assignments[i].user_id){
-        let updatedAssignment: Assignment = 
-        {
-          _id: this.assignments[i]._id,
-          user_id: formAssignmentValues[i],
-          task_id: this.assignments[i].task_id
-        };
-        this.assignmentService.putAssignment(updatedAssignment).subscribe();
+        this.updateAssignment(this.assignments[i], formAssignmentValues[i]);
       }
     }
 
-    if(databaseAmount < formAmount){
-      let newIndices = this.range(databaseAmount, formAmount - 1);
+    let formHasNewAssignments = databaseAmount < formAmount;
+    if(formHasNewAssignments){
+      let newIndices = this.createRange(databaseAmount, formAmount - 1);
       for(let i of newIndices){
-        let newAssignment: Assignment = 
-        {
-          _id: '',
-          user_id: formAssignmentValues[i],
-          task_id: this.id
-        };
-        this.assignmentService.postAssignment(newAssignment).subscribe();
+        this.postAssignment(formAssignmentValues[i]);
       }
     }
+  }
+
+  createRange(from: number, to: number): Array<number>{
+    if(from == 0){
+      return Array.from(Array(to + 1).keys()); //Example: createRange(0,3) => [0,1,2,3]
+    }
+    else {
+      let length = (to + 1) - from;
+      let tempRange = Array.from(Array(length).keys());
+      let range = tempRange.map((val)=>{return val + from})
+      return range; //Example: createRange(1,3) returns [1,2,3]
+    }    
+  }  
+
+  updateAssignment(assignment: Assignment, newUserId: string){
+    let updatedAssignment: Assignment = 
+    {
+      _id: assignment._id,
+      user_id: newUserId,
+      task_id: assignment.task_id
+    };
+    this.assignmentService.putAssignment(updatedAssignment).subscribe();
+  }
+
+  postAssignment(userId: string){
+    let newAssignment: Assignment = 
+    {
+      _id: '',
+      user_id: userId,
+      task_id: this.id
+    };
+    this.assignmentService.postAssignment(newAssignment).subscribe();
   }
 
   submitDependencies(formDependencyValues: Array<string>): Observable<Object[]> {
@@ -203,40 +182,50 @@ export class EditTaskComponent implements OnInit {
     let formAmount = formDependencyValues.length;
     
     let databaseCalls = [];
-    let existingIndices = this.range(0, databaseAmount - 1);
+    let existingIndices = this.createRange(0, databaseAmount - 1);
     
     for(let i of existingIndices){
       if(formDependencyValues[i] != this.dependencies[i].dependency_id){
-        let updatedDependency: Dependency = 
-        {
-          _id: this.dependencies[i]._id,
-          dependency_id: formDependencyValues[i],
-          task_id: this.dependencies[i].task_id
-        };
-        databaseCalls.push(this.dependencyService.putDependency(updatedDependency));
+        databaseCalls.push( this.updateDependencyObservable(this.dependencies[i], formDependencyValues[i]) );
       }
     }
 
-    if(databaseAmount < formAmount){
-      let newIndices = this.range(databaseAmount, formAmount - 1);
+    let formHasNewDependencies = databaseAmount < formAmount;
+    if(formHasNewDependencies){
+      let newIndices = this.createRange(databaseAmount, formAmount - 1);
       for(let i of newIndices){
-        let newDependency: Dependency = 
-        {
-          _id: '',
-          dependency_id: formDependencyValues[i],
-          task_id: this.id
-        };
-        databaseCalls.push(this.dependencyService.postDependency(newDependency));
+        databaseCalls.push( this.postDependencyObservable(formDependencyValues[i]) );
       }
     }    
     return forkJoin(databaseCalls);
   }
 
-  get formAssignments(){
-    return this.taskForm.get('assignments') as FormArray;
+  updateDependencyObservable(dependency: Dependency, newDependencyId: string): Observable<Object> {
+    let updatedDependency: Dependency = 
+    {
+      _id: dependency._id,
+      dependency_id: newDependencyId,
+      task_id: dependency.task_id
+    };
+    return this.dependencyService.putDependency(updatedDependency);
   }
 
-  addAssignment(): void {
+  postDependencyObservable(newDependencyId: string): Observable<Object> {
+    let newDependency: Dependency = 
+    {
+      _id: '',
+      dependency_id: newDependencyId,
+      task_id: this.id
+    };
+    return this.dependencyService.postDependency(newDependency)
+  }
+
+  get formAssignments(){
+    //Allows us to easily access the assignment form array in the functions below.
+    return this.taskForm.get('formAssignments') as FormArray;
+  }
+
+  addFormAssignment(): void {
     this.formAssignments.push(this.fb.control(''));
   }
 
@@ -245,13 +234,13 @@ export class EditTaskComponent implements OnInit {
     if(this.assignments.length > 0 && i < this.assignments.length)    {
       this.assignmentService.deleteAssignment(this.assignments[i]._id).subscribe((res)=>{
         this.assignments.splice(i, 1);
-        this.getAssignedUsers();
       });
     }
   }
 
   get formDependencies(){
-    return this.taskForm.get('dependencies') as FormArray;
+    //Allows us to easily access the dependency form array in the functions below.
+    return this.taskForm.get('formDependencies') as FormArray;
   }
 
   addDependency(): void {
@@ -264,7 +253,6 @@ export class EditTaskComponent implements OnInit {
     if(this.dependencies.length > 0 && i < this.dependencies.length)    {
       this.dependencyService.deleteDependency(this.dependencies[i]._id).subscribe((res)=>{
         this.dependencies.splice(i, 1);
-        this.getDependencyTasks();
       });
     }
   }
@@ -272,18 +260,6 @@ export class EditTaskComponent implements OnInit {
   goBack(): void {
     this.location.back();
   }
-  
-  range(from: number, to: number): Array<number>{
-    if(from == 0){
-      return Array.from(Array(to + 1).keys()); //Example: range(0,3) => [0,1,2,3]
-    }
-    else {
-      let length = (to + 1) - from;
-      let tempRange = Array.from(Array(length).keys());
-      let range = tempRange.map((val)=>{return val + from})
-      return range; //Example: range(1,3) returns [1,2,3]
-    }    
-  }  
 
   isManager(): boolean {
     return this.authService.isManager();

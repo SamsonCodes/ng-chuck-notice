@@ -43,7 +43,8 @@ export class EditUserComponent implements OnInit {
   }
 
   onSubmit(){ 
-    this.userService.putUser(this.selectedUser).subscribe((res) => {
+    this.userService.putUser(this.selectedUser).subscribe((response) => {
+      console.log(response);
       this.goBack();
     });      
   }
