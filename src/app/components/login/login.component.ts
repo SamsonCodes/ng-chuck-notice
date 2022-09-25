@@ -2,6 +2,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 import { Router } from '@angular/router';
+
 import { AuthService } from 'src/app/services/auth.service';
 
 @Component({
@@ -41,13 +42,12 @@ export class LoginComponent implements OnInit {
     
     this.http.post('http://localhost:3000/api/users/login', reqObject, { headers: headers }).subscribe(
       
-      // The response data
-      (response) => {
-        // If the user authenticates successfully, we need to store the JWT returned in localStorage
+      // next(): If the user authenticates successfully, we need to store the JWT returned in localStorage
+      (response) => {        
         this.authService.setLocalStorage(response);
       },
 
-      // If there is an error
+      // error(): This ends the subscription to the login http request
       (error) => {
         console.log(error);
         if(error.status==401){
@@ -57,7 +57,7 @@ export class LoginComponent implements OnInit {
         }
       },
       
-      // When observable completes
+      // complete(): If the login call is completed successfully we need to redirect the user to the root page
       () => {
         console.log('redirecting to /')
         this.router.navigate(['']);
