@@ -88,7 +88,7 @@ export class TasksComponent implements OnInit, AfterViewInit {
   }
   
   refreshTaskList(){
-    if(!this.authService.isManager()){
+    if(!this.authService.hasManagerRights()){
       let userId = this.authService.getUser()!._id;
       this.taskService.getUserTasks(userId).subscribe((res) => {
         this.tasks = res as Task[];
@@ -215,7 +215,7 @@ export class TasksComponent implements OnInit, AfterViewInit {
   }
 
   isManager(): boolean {
-    return this.authService.isManager();
+    return this.authService.hasManagerRights();
   }
 
   /** Announce the change in sort state for assistive technology. */

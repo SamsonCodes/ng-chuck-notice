@@ -14,9 +14,9 @@ export class HeaderComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.currentUser = this.authService.getUser();
+    this.currentUser = this.authService.getUser(); //This loads the currentUser whenever the app is first opened or refreshed
     this.authService.currentUser.subscribe((x)=>{
-      this.currentUser=x;
+      this.currentUser = x; // This listens to UPDATES for the currentUser so the header is updated as soon as it changes (for example when logging in) 
     });
   }
 
@@ -25,9 +25,6 @@ export class HeaderComponent implements OnInit {
   }
 
   isAdmin(): boolean {
-    if(!this.currentUser){
-      return false;
-    }
-    return this.currentUser.userGroup == "admins" || this.currentUser.userGroup == "master";
+    return this.authService.hasAdminRights();
   }
 }

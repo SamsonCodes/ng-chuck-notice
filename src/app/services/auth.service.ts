@@ -9,7 +9,7 @@ import { User } from '../classes/user';
 })
 export class AuthService {
   private currentUserSubject: Subject<User>;
-  public currentUser: Observable<User>;
+  public currentUser: Observable<User>; //The currentUser is set as a public observable object so that it can be subscribed to in other components for live updates where needed.
 
   constructor() {
     this.currentUserSubject = new Subject<User>();
@@ -37,36 +37,6 @@ export class AuthService {
     return moment().isBefore(this.getExpiration());
   }
 
-  getUser(): User | undefined {
-    let token = localStorage.getItem('token');
-    if(token){
-      let payload = this.parseJwt(token);
-      return this.extractUserFromPayload(payload);
-    }
-    else{
-      return undefined;
-    }      
-  }
-
-  isManager(): boolean {    
-    let user = this.getUser();
-    if(user){
-      return (user.userGroup === 'managers' || user.userGroup === 'admins' || user.userGroup === 'master');
-      //For now, admins have manager rights too.
-    }
-    return false;
-  }
-
-  extractUserFromPayload(payload: any) : User {
-    return new User(
-      payload.sub, 
-      payload.name,
-      "",
-      payload.userGroup,
-      payload.penalties
-    );
-  }
-
   isLoggedOut() {
     return !this.isLoggedIn();
   }
@@ -85,5 +55,43 @@ export class AuthService {
     var base64Url = token.split('.')[1];
     var base64 = base64Url.replace('-', '+').replace('_', '/');
     return JSON.parse(atob(base64));
+  }
+
+  getUser(): User | undefined { //This directly reads the current user data from the payload, so unlike the currentUser variable it's a snapshot, not a datastream
+    let token = localStorage.getItem('token');
+    if(token){
+      let payload = this.parseJwt(token);
+      return this.extractUserFromPayload(payload);
+    }
+    else{
+      return undefined;
+    }      
+  }
+
+  extractUserFromPayload(payload: any) : User {
+    return new User(
+      payload.sub, 
+      payload.name,
+      "",
+      payload.userGroup,
+      payload.penalties
+    );
+  }
+
+  hasManagerRights(): boolean {    
+    let user = this.getUser();
+    if(user){
+      return (user.userGroup === 'managers' || user.userGroup === 'admins' || user.userGroup === 'master');
+      //For now, admins have manager rights too.
+    }
+    return false;
+  }
+  
+  hasAdminRights(): boolean {
+    let user = this.getUser();
+    if(user){
+      return (user.userGroup === 'admins' || user.userGroup === 'master');
+    }
+    return false;
   }
 }

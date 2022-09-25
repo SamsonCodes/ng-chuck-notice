@@ -262,7 +262,7 @@ export class EditTaskComponent implements OnInit {
   }
 
   isManager(): boolean {
-    return this.authService.isManager();
+    return this.authService.hasManagerRights();
   } 
 
   getUserName(id:string){
