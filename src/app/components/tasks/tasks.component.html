@@ -45,18 +45,18 @@
         </select>
     </div>
     <div formArrayName="assignments" class="form-group">
-        <div *ngIf="isManager()">
+        <div *ngIf="hasManagerRights()">
             <h2>Assignments</h2>   
             <div *ngFor="let assignment of formAssignments.controls; let i=index">
                 <!-- The repeated assignment template -->
                 <select id="assignment-{{ i }}" type="text" [formControlName]="i">
                     <option *ngFor="let user of this.allUsers" value="{{user._id}}">{{user.name}}</option>
                 </select>   
-                <span (click)="removeAssignment(i)">
+                <span (click)="removeFormAssignment(i)">
                     <i class="material-icons">delete</i>
                 </span>       
             </div>
-            <button type="button" (click)="addAssignment()">+ Add</button>
+            <button type="button" (click)="addFormAssignment()">+ Add</button>
         </div>
     </div>
     <div formArrayName="dependencies" class="form-group">
@@ -66,66 +66,71 @@
             <select id="dependency-{{ i }}" type="text" [formControlName]="i">
                 <option *ngFor="let task of this.tasks" value="{{task._id}}">{{task.title}}</option>
             </select>   
-            <span (click)="removeDependency(i)">
+            <span (click)="removeFormDependency(i)">
                 <i class="material-icons">delete</i>
             </span>       
         </div>
-        <button type="button" (click)="addDependency()">+ Add</button>
+        <button type="button" (click)="addFormDependency()">+ Add</button>
     </div>
     <button *ngIf="taskForm.valid" class="btn btn-lg btn-primary btn-block" type="submit">Add Task</button>    
            
 </form>
+
 <div class="table-div">
+
     <label for="filterInput">Filter:</label>
     <input id="filterInput" name="filter" type="text" [(ngModel)]="filterInput" (change)="onFilterChange()">
+
     <table mat-table [dataSource]="dataSource" class="mat-elevation-z8" matSort (matSortChange)="announceSortChange($event)">
-    <!-- Title Column -->
-    <ng-container matColumnDef="title">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by title"> Title </th>
-        <td mat-cell *matCellDef="let element"> {{element.title}} </td>
-    </ng-container>
+        <!-- Title Column -->
+        <ng-container matColumnDef="title">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by title"> Title </th>
+            <td mat-cell *matCellDef="let element"> {{element.title}} </td>
+        </ng-container>
 
-    <!-- Description Column -->
-    <ng-container matColumnDef="description">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by description"> Description </th>
-        <td mat-cell *matCellDef="let element"> {{element.description}} </td>
-    </ng-container>
+        <!-- Description Column -->
+        <ng-container matColumnDef="description">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by description"> Description </th>
+            <td mat-cell *matCellDef="let element"> {{element.description}} </td>
+        </ng-container>
 
-    <!-- Deadline Column -->
-    <ng-container matColumnDef="deadline">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by deadline"> Deadline </th>
-        <td mat-cell *matCellDef="let element"> {{element.deadline}} </td>
-    </ng-container>
+        <!-- Deadline Column -->
+        <ng-container matColumnDef="deadline">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by deadline"> Deadline </th>
+            <td mat-cell *matCellDef="let element"> {{element.deadline}} </td>
+        </ng-container>
 
-    <!-- Status Column -->
-    <ng-container matColumnDef="status">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by status"> Status </th>
-        <td mat-cell *matCellDef="let element"> {{element.status}} </td>
-    </ng-container>
+        <!-- Status Column -->
+        <ng-container matColumnDef="status">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by status"> Status </th>
+            <td mat-cell *matCellDef="let element"> {{element.status}} </td>
+        </ng-container>
 
-     <!-- Created On Column -->
-     <ng-container matColumnDef="created_on">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by created_on"> Created On </th>
-        <td mat-cell *matCellDef="let element"> {{element.created_on}} </td>
-    </ng-container>
+        <!-- Created On Column -->
+        <ng-container matColumnDef="created_on">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by created_on"> Created On </th>
+            <td mat-cell *matCellDef="let element"> {{element.created_on}} </td>
+        </ng-container>
 
-    <!-- Actions Column -->
-    <ng-container matColumnDef="actions">
-        <th mat-header-cell *matHeaderCellDef> Actions</th>
-        <td mat-cell *matCellDef="let element"> 
-            <a routerLink="/edit-task/{{element._id}}">
-                <i class="material-icons">edit</i>
-            </a>    
-            <a (click)="onDelete(element._id)">
-                <i class="material-icons">delete</i>
-            </a>
-        </td>
-    </ng-container>
+        <!-- Actions Column -->
+        <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef> Actions </th>
+            <td mat-cell *matCellDef="let element"> 
+                <a routerLink="/edit-task/{{element._id}}">
+                    <i class="material-icons">edit</i>
+                </a>    
+                <a (click)="onDelete(element._id)">
+                    <i class="material-icons">delete</i>
+                </a>
+            </td>
+        </ng-container>
 
-    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
     </table>
-    <mat-paginator [pageSizeOptions]="[5, 10, 20]"
+
+    <mat-paginator 
+        [pageSizeOptions]="[5, 10, 20]"
         showFirstLastButtons 
         aria-label="Select page of tasks">
     </mat-paginator>

@@ -88,7 +88,7 @@ export class TasksComponent implements OnInit, AfterViewInit {
   }
   
   refreshTaskList(){
-    if(!this.authService.hasManagerRights()){
+    if(!this.authService.hasManagerRights()){ // If no manager rights then only get USER tasks
       let userId = this.authService.getUser()!._id;
       this.taskService.getUserTasks(userId).subscribe((res) => {
         this.tasks = res as Task[];
@@ -96,7 +96,7 @@ export class TasksComponent implements OnInit, AfterViewInit {
       });
     }
     else{
-      this.taskService.getTasks().subscribe((res) => {
+      this.taskService.getTasks().subscribe((res) => { // Otherwise get ALL the tasks
         this.tasks = res as Task[];      
         this.dataSource.data = this.tasks;  
       });
@@ -106,18 +106,21 @@ export class TasksComponent implements OnInit, AfterViewInit {
 
   onSubmit(){        
     this.newTask.created_on = this.getCreatedOn();
-    this.taskService.postTask(this.newTask).pipe(      
+    this.taskService.postTask(this.newTask).pipe(
+      //Using a switchMap here to make sure all the database updates are finished before refreshing the task list.      
       switchMap((taskData) => {
         let task = taskData as Task;
-        let observableList = [];
+        
         let assignments: string[] = [];
-        if(this.isManager()){          
-         assignments = this.taskForm.value.assignments;
+        if(this.hasManagerRights()){          
+          assignments = this.taskForm.value.assignments;
         }
         else{
           let id = this.authService.getUser()!._id;
-          assignments = [id!];          
+          assignments = [id!]; // Only add assignment to current user         
         }
+
+        let observableList = [];
         observableList.push(this.submitAssignments(assignments, task._id));
         observableList.push(this.submitDependencies(this.taskForm.value.dependencies, task._id));
         return combineLatest(observableList);
@@ -187,34 +190,36 @@ export class TasksComponent implements OnInit, AfterViewInit {
   }  
 
   get formAssignments(){
+    //Allows us to easily access the assignment form array in the functions below.
     return this.taskForm.get('assignments') as FormArray;
   }
 
-  addAssignment(): void {
+  addFormAssignment(): void {    
     this.formAssignments.push(this.fb.control(''));
   }
 
-  removeAssignment(i: number): void {    
+  removeFormAssignment(i: number): void {    
     this.formAssignments.removeAt(i);
   }
 
   get formDependencies(){
+    //Allows us to easily access the dependency form array in the functions below.
     return this.taskForm.get('dependencies') as FormArray;
   }
 
-  addDependency(): void {
+  addFormDependency(): void {
     this.formDependencies.push(this.fb.control(''));
     this.taskForm.patchValue({status: 'waiting'});
   }
 
-  removeDependency(i: number): void {
+  removeFormDependency(i: number): void {
     this.formDependencies.removeAt(i);
     if(this.formDependencies.length == 0){
       this.taskForm.patchValue({status: 'open'});
     }
   }
 
-  isManager(): boolean {
+  hasManagerRights(): boolean {
     return this.authService.hasManagerRights();
   }
 
