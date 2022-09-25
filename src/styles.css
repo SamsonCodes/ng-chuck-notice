@@ -1,8 +1,13 @@
+/* You can add global styles to this file, and also import other style files */
+
 @import '@angular/material/prebuilt-themes/deeppurple-amber.css';
 
-/* You can add global styles to this file, and also import other style files */
+html, body { height: 100%; }
+
 body {
     padding-top: 5rem;
+    margin: 0; 
+    font-family: Roboto, "Helvetica Neue", sans-serif;
 }
 
 .ng-valid[required], .ng-valid.required  {
@@ -19,8 +24,3 @@ div.alert {
     padding: 1rem;
     margin-bottom: 1rem;
 }
-html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
-
-
-
