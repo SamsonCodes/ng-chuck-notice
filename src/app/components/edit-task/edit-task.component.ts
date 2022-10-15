@@ -41,6 +41,31 @@ export class EditTaskComponent implements OnInit {
 
   otherTasks: Task[] = [];
   dependencies: Dependency[] = []; 
+
+  selectConfig = {
+    valueField: "value",
+    labelField: "label",
+    highlight: false,
+    create: false,
+    persist: true,
+    plugins: ['dropdown_direction', 'remove_button'],
+    dropdownDirection: 'down',
+    searchField: ['label']
+  };
+  data = [
+    {
+      label: 'Option 1',
+      value: '1'
+    },
+      {
+      label: 'Option 2',
+      value: '2'
+    },
+      {
+      label: 'Option 3',
+      value: '3'
+    }
+  ]
   
   constructor(
     private route: ActivatedRoute,
@@ -85,8 +110,21 @@ export class EditTaskComponent implements OnInit {
       let allTasks = res as Task[];      
       this.otherTasks = allTasks.filter(task=>
         (task._id != this.id)
-      )      
+      );      
+      this.createSelectOptions();
     })
+  }
+
+  createSelectOptions(){
+    let options = []
+    for(let i = 0; i < this.otherTasks.length; i++){
+      let dataObject = {
+        'label': this.otherTasks[i].title,
+        'value': this.otherTasks[i]._id
+      }
+      options.push(dataObject);
+    }
+    this.data = options;
   }
 
   getAssignments(): void {    

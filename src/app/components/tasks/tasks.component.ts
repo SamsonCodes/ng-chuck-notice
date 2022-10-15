@@ -50,7 +50,6 @@ export class TasksComponent implements OnInit, AfterViewInit {
     dropdownDirection: 'down',
     searchField: ['label']
   };
-  public val = null;
   data = [
     {
       label: 'Option 1',
@@ -140,7 +139,6 @@ export class TasksComponent implements OnInit, AfterViewInit {
       }
       options.push(dataObject);
     }
-    console.log(options);
     this.data = options;
   }
 
