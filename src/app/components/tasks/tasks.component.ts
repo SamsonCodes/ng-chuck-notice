@@ -40,6 +40,32 @@ export class TasksComponent implements OnInit, AfterViewInit {
     created_on: ''
   }
 
+  selectConfig = {
+    valueField: "value",
+    labelField: "label",
+    highlight: false,
+    create: false,
+    persist: true,
+    plugins: ['dropdown_direction', 'remove_button'],
+    dropdownDirection: 'down',
+    searchField: ['label']
+  };
+  public val = null;
+  data = [
+    {
+      label: 'Option 1',
+      value: '1'
+    },
+      {
+      label: 'Option 2',
+      value: '2'
+    },
+      {
+      label: 'Option 3',
+      value: '3'
+    }
+  ]
+
   newTask = Object.assign({}, this.defaultValues) as Task;
 
   taskForm = this.fb.group({
@@ -93,15 +119,29 @@ export class TasksComponent implements OnInit, AfterViewInit {
       this.taskService.getUserTasks(userId).subscribe((res) => {
         this.tasks = res as Task[];
         this.dataSource.data = this.tasks;
+        this.createSelectOptions();
       });
     }
     else{
       this.taskService.getTasks().subscribe((res) => { // Otherwise get ALL the tasks
         this.tasks = res as Task[];      
         this.dataSource.data = this.tasks;  
+        this.createSelectOptions();
       });
     }  
+  }
 
+  createSelectOptions(){
+    let options = []
+    for(let i = 0; i < this.tasks.length; i++){
+      let dataObject = {
+        'label': this.tasks[i].title,
+        'value': this.tasks[i]._id
+      }
+      options.push(dataObject);
+    }
+    console.log(options);
+    this.data = options;
   }
 
   onSubmit(){        
@@ -241,5 +281,9 @@ export class TasksComponent implements OnInit, AfterViewInit {
     let filterValue = this.filterInput.trim();
     filterValue = filterValue.toLowerCase();
     this.dataSource.filter = filterValue;
+  }
+
+  public selectChanged() {
+    console.log('changed');
   }
 }

@@ -61,6 +61,8 @@
     </div>
     <div formArrayName="dependencies" class="form-group">
         <h2>Dependencies</h2>   
+        <ng-selectize [config] = "selectConfig" [options] = "data" [(ngModel)]="val" 
+        (ngModelChange)="selectChanged()"></ng-selectize>
         <div *ngFor="let dependency of formDependencies.controls; let i=index">
             <!-- The repeated dependency template -->
             <select id="dependency-{{ i }}" type="text" [formControlName]="i">

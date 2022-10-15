@@ -21,6 +21,7 @@ import { AboutPageComponent } from './components/about-page/about-page.component
 import { AppRoutingModule } from './app-routing.module';
 import { AuthService } from './services/auth.service';
 import { AuthInterceptor } from './interceptors/auth.interceptor';
+import { NgSelectizeModule } from 'ng-selectize';
 
 @NgModule({
   declarations: [
@@ -44,7 +45,8 @@ import { AuthInterceptor } from './interceptors/auth.interceptor';
     MatButtonModule,
     MatTableModule,
     MatPaginatorModule,
-    MatSortModule
+    MatSortModule,
+    NgSelectizeModule
   ],
   providers: [
     AuthService,
