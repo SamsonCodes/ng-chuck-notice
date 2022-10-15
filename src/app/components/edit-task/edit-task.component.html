@@ -25,9 +25,11 @@
         >
     </div>
     <div class="form-group">
-        <label for="deadlineInput">Deadline</label>
+        <label for="deadlineInput">Deadline</label><br>
         <input 
-            type="date" id="deadlineInput" formControlName="deadline"
+            type="date" id="deadlineInput" 
+            formControlName="deadline"
+            class="form-control" 
             min="2022-08-01" max="2052-12-31"
             [(ngModel)]="this.selectedTask.deadline"
         >
@@ -47,10 +49,10 @@
         </select>
     </div>
     <div *ngIf= "isManager()" formArrayName="formAssignments" class="form-group">
-        <h2>Assignments</h2> 
+        Assignments<br> 
         <div *ngFor="let assignment of formAssignments.controls; let i=index">
             <!-- The repeated assignment template -->
-            <select id="assignment-{{ i }}" type="text" [formControlName]="i">
+            <select id="assignment-{{ i }}" class="form-control" type="text" [formControlName]="i">
                 <option *ngFor="let user of this.allUsers" value="{{user._id}}">{{user.name}}</option>
             </select>   
             <span (click)="removeAssignment(i)">
@@ -60,14 +62,15 @@
         <button type="button" (click)="addFormAssignment()">+ Add</button>
     </div>
     <div *ngIf= "!isManager()" class="form-group">
-        <h2>Assignments</h2> 
-        <div *ngFor="let assignment of formAssignments.controls; let i=index">
-            <!-- The repeated assignment template -->
-            <span>{{getUserName(assignment.value)}}</span>
-        </div>
+        Assignments<br>
+        <ul>
+            <li *ngFor="let assignment of formAssignments.controls; let i=index">
+                {{getUserName(assignment.value)}}
+            </li>
+        </ul>        
     </div>
     <div formArrayName="formDependencies" class="form-group">
-        <h2>Dependencies</h2>   
+        Dependencies<br>
         <div *ngFor="let dependency of formDependencies.controls; let i=index">
             <!-- The repeated dependency template -->
             <!-- <select id="dependency-{{ i }}" type="text" [formControlName]="i">

@@ -25,9 +25,11 @@
         >
     </div>
     <div class="form-group">
-        <label for="deadlineInput">Deadline</label>
+        <label for="deadlineInput">Deadline</label><br>
         <input 
-            type="date" id="deadlineInput" formControlName="deadline"
+            type="date" id="deadlineInput" 
+            formControlName="deadline"
+            class="form-control"
             min="2022-08-01" max="2052-12-31"
             [(ngModel)]="this.newTask.deadline"
         >
@@ -46,10 +48,10 @@
     </div>
     <div formArrayName="assignments" class="form-group">
         <div *ngIf="hasManagerRights()">
-            <h2>Assignments</h2>   
+            Assignments<br>  
             <div *ngFor="let assignment of formAssignments.controls; let i=index">
                 <!-- The repeated assignment template -->
-                <select id="assignment-{{ i }}" type="text" [formControlName]="i">
+                <select id="assignment-{{ i }}" class="form-control" type="text" [formControlName]="i">
                     <option *ngFor="let user of this.allUsers" value="{{user._id}}">{{user.name}}</option>
                 </select>   
                 <span (click)="removeFormAssignment(i)">
@@ -60,7 +62,7 @@
         </div>
     </div>
     <div formArrayName="dependencies" class="form-group">
-        <h2>Dependencies</h2>  
+        Dependencies<br>
         <div *ngFor="let dependency of formDependencies.controls; let i=index">
             <!-- The repeated dependency template -->
             <!-- <select id="dependency-{{ i }}" type="text" [formControlName]="i">

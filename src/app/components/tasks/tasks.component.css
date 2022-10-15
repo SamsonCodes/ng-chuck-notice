@@ -10,3 +10,7 @@ th.mat-sort-header-sorted {
 .table-div {
     margin-top: 10px;
 }
+
+#filterInput {
+    margin-left: 5px;
+}
