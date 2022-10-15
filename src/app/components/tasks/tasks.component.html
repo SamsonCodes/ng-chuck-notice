@@ -60,14 +60,13 @@
         </div>
     </div>
     <div formArrayName="dependencies" class="form-group">
-        <h2>Dependencies</h2>   
-        <ng-selectize [config] = "selectConfig" [options] = "data" [(ngModel)]="val" 
-        (ngModelChange)="selectChanged()"></ng-selectize>
+        <h2>Dependencies</h2>  
         <div *ngFor="let dependency of formDependencies.controls; let i=index">
             <!-- The repeated dependency template -->
-            <select id="dependency-{{ i }}" type="text" [formControlName]="i">
+            <!-- <select id="dependency-{{ i }}" type="text" [formControlName]="i">
                 <option *ngFor="let task of this.tasks" value="{{task._id}}">{{task.title}}</option>
-            </select>   
+            </select>    -->
+            <ng-selectize [config]="selectConfig" [options]="data" [formControlName]="i"></ng-selectize>
             <span (click)="removeFormDependency(i)">
                 <i class="material-icons">delete</i>
             </span>       

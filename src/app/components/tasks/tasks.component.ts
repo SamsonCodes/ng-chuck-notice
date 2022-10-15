@@ -282,8 +282,4 @@ export class TasksComponent implements OnInit, AfterViewInit {
     filterValue = filterValue.toLowerCase();
     this.dataSource.filter = filterValue;
   }
-
-  public selectChanged() {
-    console.log('changed');
-  }
 }
