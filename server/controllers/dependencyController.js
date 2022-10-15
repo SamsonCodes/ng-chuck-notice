@@ -62,7 +62,7 @@ module.exports.getByDependencyId = function(req, res){
 
 //UPDATE
 module.exports.updateOne = function(req, res){ 
-    var newDependencyData = unpackBody(req);
+    var newDependencyData = unpackDependencyData(req);
     Dependency.findByIdAndUpdate(req.params.id, {$set : newDependencyData }, {new: true}, (err, doc) => {
         if(!err){ res.send(doc);}
         else {
