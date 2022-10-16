@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormArray, FormBuilder } from '@angular/forms';
 import { ActivatedRoute, Params } from '@angular/router';
 import { Location } from '@angular/common';
+
 import { forkJoin, Observable } from 'rxjs';
 import { defaultIfEmpty } from 'rxjs/operators';
 
@@ -14,7 +15,7 @@ import { User } from 'src/app/classes/user';
 import { DependencyService } from 'src/app/services/dependency.service';
 import { Dependency } from 'src/app/classes/dependency';
 import { AuthService } from 'src/app/services/auth.service';
-
+import { ChuckNorrisApiService } from 'src/app/services/chuck-norris-api.service';
 
 @Component({
   selector: 'app-edit-task',
@@ -75,7 +76,8 @@ export class EditTaskComponent implements OnInit {
     private userService: UserService,
     private dependencyService: DependencyService,
     private fb: FormBuilder,
-    private authService: AuthService
+    private authService: AuthService,
+    private chuckService: ChuckNorrisApiService
   ) {}
 
   ngOnInit(): void {
@@ -84,7 +86,7 @@ export class EditTaskComponent implements OnInit {
     this.getAllUsers();
     this.getOtherTasks();
     this.getAssignments();
-    this.getDependencies();   
+    this.getDependencies(); 
   }
 
   getId(): void {
@@ -146,6 +148,15 @@ export class EditTaskComponent implements OnInit {
   }
 
   onSubmit(): void {   
+    console.log(this.selectedTask)
+    if(this.selectedTask.status == "finished"){
+      console.log('Finished');
+      this.getJoke().subscribe(response=>{
+        let object = response as any;
+        let joke = object.value;
+        alert(joke);
+      })
+    }    
     this.submitAssignments(this.taskForm.value.formAssignments);  
     this.submitDependencies(this.taskForm.value.formDependencies)
       .pipe(
@@ -305,5 +316,9 @@ export class EditTaskComponent implements OnInit {
 
   getUserName(id:string){
     return this.allUsers.find(element=> element._id == id)?.name;
+  }
+
+  getJoke(){
+    return this.chuckService.getOne();
   }
 }
