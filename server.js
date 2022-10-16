@@ -4,13 +4,14 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const passport = require('passport');
 const path = require('path');
+const axios = require('axios');
 
 const userApi = require('./server/routes/user-api.js');
 const taskApi = require('./server/routes/task-api.js');
 const assignmentApi = require('./server/routes/assignment-api.js');
 const dependencyApi = require('./server/routes/dependency-api.js');
 const utils = require('./server/lib/utils');
-const axios = require('axios');
+const Joke = require('./server/models/joke');
 
 require('dotenv').config();
 
@@ -123,8 +124,7 @@ function setDailyJoke(){
   .then(response => {
     let newJoke = response.data.value;    
     
-    console.log('newJoke:' + newJoke);
-    const Joke = require('./server/models/joke');
+    console.log('newJoke:' + newJoke);    
     Joke.find({}, (error, jokes)=>{
       if(jokes.length == 0){ 
         //If there is no joke in the database yet, add it.
@@ -145,4 +145,16 @@ function setDailyJoke(){
   .catch(error => {
     console.log(error);
   });
+
+  app.get('/api/daily-joke', function(req, res){
+    Joke.find((error, jokes)=>{
+      if(error){
+        console.log(error);
+        res.end("Server error: " + err.toString());
+      } else {
+        let joke = jokes[0].joke;
+        res.json({'joke': joke});
+      }      
+    })
+  })
 }
