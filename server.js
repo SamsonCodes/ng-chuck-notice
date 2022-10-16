@@ -10,6 +10,7 @@ const taskApi = require('./server/routes/task-api.js');
 const assignmentApi = require('./server/routes/assignment-api.js');
 const dependencyApi = require('./server/routes/dependency-api.js');
 const utils = require('./server/lib/utils');
+const axios = require('axios');
 
 require('dotenv').config();
 
@@ -60,6 +61,8 @@ app.listen(port, () => {
 checkOverdueTasks();
 //  setInterval(checkOverdueTasks, 24*60*60*1000); //every day
 setInterval(checkOverdueTasks, 60*1000); //every minute
+
+setDailyJoke();
  
 function checkOverdueTasks(){  
   console.log('Checking overdue tasks');
@@ -113,4 +116,33 @@ function penalizeAssignedUsers(overdueTask){
     })
   })
   return promise;
+}
+
+function setDailyJoke(){
+  axios.get('https://api.chucknorris.io/jokes/random')
+  .then(response => {
+    let newJoke = response.data.value;    
+    
+    console.log('newJoke:' + newJoke);
+    const Joke = require('./server/models/joke');
+    Joke.find({}, (error, jokes)=>{
+      if(jokes.length == 0){ 
+        //If there is no joke in the database yet, add it.
+        newJokeData = new Joke({joke: newJoke});
+        newJokeData.save();
+        console.log('Added joke to database.');
+      } else { 
+        //If there already is one, change it.
+        jokes[0].joke=newJoke;
+        jokes[0].save();
+        console.log('Changed joke in database.');
+      }
+      if(error){
+        console.log(error);
+      }
+    })
+  })
+  .catch(error => {
+    console.log(error);
+  });
 }
