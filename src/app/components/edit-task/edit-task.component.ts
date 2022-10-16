@@ -67,6 +67,7 @@ export class EditTaskComponent implements OnInit {
       value: '3'
     }
   ]
+  finishedOnLoad = false;
   
   constructor(
     private route: ActivatedRoute,
@@ -98,6 +99,9 @@ export class EditTaskComponent implements OnInit {
   getTask(): void {
     this.taskService.getTask(this.id).subscribe(task => {
         this.selectedTask = task as Task;  
+        if(this.selectedTask.status == 'finished'){
+          this.finishedOnLoad = true;
+        }
     });
   }
 
@@ -149,7 +153,7 @@ export class EditTaskComponent implements OnInit {
 
   onSubmit(): void {   
     console.log(this.selectedTask)
-    if(this.selectedTask.status == "finished"){
+    if(this.selectedTask.status == "finished" && !this.finishedOnLoad){
       console.log('Finished');
       this.getJoke().subscribe(response=>{
         let object = response as any;
