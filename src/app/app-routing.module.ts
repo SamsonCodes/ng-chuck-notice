@@ -12,12 +12,13 @@ import { IsAssignedGuard } from './guards/is-assigned.guard';
 import { NotKickedGuard } from './guards/not-kicked.guard';
 import { KickedPageComponent } from './components/kicked-page/kicked-page.component';
 import { AboutPageComponent } from './components/about-page/about-page.component';
+import { DailyJokePageComponent } from './components/daily-joke-page/daily-joke-page.component';
 
 const routes: Routes = [
   { 
     path: '', 
     pathMatch: 'full',    
-    redirectTo: '/tasks'
+    redirectTo: '/daily-fact'
   },
   { 
     path: 'login', 
@@ -50,6 +51,11 @@ const routes: Routes = [
   { 
     path: 'kicked', 
     component: KickedPageComponent,
+    canActivate: [IsAuthenticatedGuard]
+  },
+  { 
+    path: 'daily-fact', 
+    component: DailyJokePageComponent,
     canActivate: [IsAuthenticatedGuard]
   }
 ];

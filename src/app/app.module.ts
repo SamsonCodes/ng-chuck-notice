@@ -22,6 +22,7 @@ import { AppRoutingModule } from './app-routing.module';
 import { AuthService } from './services/auth.service';
 import { AuthInterceptor } from './interceptors/auth.interceptor';
 import { NgSelectizeModule } from 'ng-selectize';
+import { DailyJokePageComponent } from './components/daily-joke-page/daily-joke-page.component';
 
 @NgModule({
   declarations: [
@@ -33,7 +34,8 @@ import { NgSelectizeModule } from 'ng-selectize';
     EditTaskComponent,
     LoginComponent,
     KickedPageComponent,
-    AboutPageComponent
+    AboutPageComponent,
+    DailyJokePageComponent
   ],
   imports: [
     BrowserModule,
