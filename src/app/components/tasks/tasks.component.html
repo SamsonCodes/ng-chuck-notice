@@ -58,7 +58,7 @@
                     <i class="material-icons">delete</i>
                 </span>       
             </div>
-            <button type="button" (click)="addFormAssignment()">+ Add</button>
+            <button type="button" class="btn" (click)="addFormAssignment()">+ Add</button>
         </div>
     </div>
     <div formArrayName="dependencies" class="form-group">
@@ -73,9 +73,9 @@
                 <i class="material-icons">delete</i>
             </span>       
         </div>
-        <button type="button" (click)="addFormDependency()">+ Add</button>
+        <button type="button" class="btn" (click)="addFormDependency()">+ Add</button>
     </div>
-    <button *ngIf="taskForm.valid" class="btn btn-lg btn-primary btn-block" type="submit">Add Task</button>    
+    <button *ngIf="taskForm.valid" class="btn btn-lg btn-dark btn-block" type="submit">Add Task</button>    
            
 </form>
 
