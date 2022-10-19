@@ -56,7 +56,7 @@ const routes: Routes = [
   { 
     path: 'daily-fact', 
     component: DailyJokePageComponent,
-    canActivate: [IsAuthenticatedGuard]
+    canActivate: [IsAuthenticatedGuard, NotKickedGuard]
   }
 ];
 
