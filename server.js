@@ -56,14 +56,26 @@ app.listen(port, () => {
   console.log(`Example app listening on http://localhost:${port}`)
 });
 
+app.get('/api/daily-joke', function(req, res){
+  Joke.find((error, jokes)=>{
+    if(error){
+      console.log(error);
+      res.end("Server error: " + err.toString());
+    } else {
+      let joke = jokes[0].joke;
+      res.json({'joke': joke});
+    }      
+  })
+})
+
 /**
  * -------------- TASK MONITORING ----------------
  */
 checkOverdueTasks();
-//  setInterval(checkOverdueTasks, 24*60*60*1000); //every day
 setInterval(checkOverdueTasks, 60*1000); //every minute
 
 setDailyJoke();
+setInterval(setDailyJoke, 24*60*60*1000); //every day
  
 function checkOverdueTasks(){  
   console.log('Checking overdue tasks');
@@ -122,9 +134,10 @@ function penalizeAssignedUsers(overdueTask){
 function setDailyJoke(){
   axios.get('https://api.chucknorris.io/jokes/random')
   .then(response => {
-    let newJoke = response.data.value;    
+    console.log("Response: " + response.data.value);
+    let newJoke = capitalizeFirstLetter(response.data.value);    
     
-    console.log('newJoke:' + newJoke);    
+    console.log('newJoke: ' + newJoke);    
     Joke.find({}, (error, jokes)=>{
       if(jokes.length == 0){ 
         //If there is no joke in the database yet, add it.
@@ -146,15 +159,8 @@ function setDailyJoke(){
     console.log(error);
   });
 
-  app.get('/api/daily-joke', function(req, res){
-    Joke.find((error, jokes)=>{
-      if(error){
-        console.log(error);
-        res.end("Server error: " + err.toString());
-      } else {
-        let joke = jokes[0].joke;
-        res.json({'joke': joke});
-      }      
-    })
-  })
+  function capitalizeFirstLetter(string) {
+    return string.charAt(0).toUpperCase() + string.slice(1);
+  }
+  
 }
