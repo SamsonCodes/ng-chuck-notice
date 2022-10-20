@@ -155,9 +155,7 @@ export class EditTaskComponent implements OnInit {
     console.log(this.selectedTask)
     if(this.selectedTask.status == "finished" && !this.finishedOnLoad){
       console.log('Finished');
-      this.getJoke().subscribe(response=>{
-        let object = response as any;
-        let joke = object.value;
+      this.getJoke().subscribe(joke => {
         alert(joke);
       })
     }    

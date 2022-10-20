@@ -11,10 +11,8 @@ export class DailyJokePageComponent implements OnInit {
   constructor(private chuckService: ChuckNorrisApiService) { }
 
   ngOnInit(): void {
-    this.chuckService.getDaily().subscribe(res=>{
-      console.log(res);
-      let resAny = res as any;
-      this.fact = resAny.joke;
+    this.chuckService.getDaily().subscribe(joke => {      
+      this.fact = joke;
     })
   }
 
