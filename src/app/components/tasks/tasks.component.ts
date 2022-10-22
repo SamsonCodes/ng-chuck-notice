@@ -150,7 +150,7 @@ export class TasksComponent implements OnInit, AfterViewInit {
         let task = taskData as Task;
         
         let assignments: string[] = [];
-        if(this.hasManagerRights()){          
+        if(this.authService.hasManagerRights()){          
           assignments = this.taskForm.value.assignments;
         }
         else{
@@ -255,10 +255,6 @@ export class TasksComponent implements OnInit, AfterViewInit {
     if(this.formDependencies.length == 0){
       this.taskForm.patchValue({status: 'open'});
     }
-  }
-
-  hasManagerRights(): boolean {
-    return this.authService.hasManagerRights();
   }
 
   /** Announce the change in sort state for assistive technology. */
