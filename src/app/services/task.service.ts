@@ -68,7 +68,7 @@ export class TaskService {
     return observable;
   }
 
-  private dependencyCheckAndUpdate(task: Task): Observable<void> { 
+  public dependencyCheckAndUpdate(task: Task): Observable<void> { 
     console.log(`Performing dependencyCheckAndUpdate for ${task.title}`);
     let observable = new Observable(subscriber => {
       this.getDependencyTasks(task._id).subscribe((res)=> {        

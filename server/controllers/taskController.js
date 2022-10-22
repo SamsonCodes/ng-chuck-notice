@@ -5,7 +5,10 @@ module.exports.addOne = function(req, res){
     var newTaskData = unpackTaskData(req);
     var newTask = new Task(newTaskData);
     newTask.save((err, doc) => {
-        if(!err){ res.send(doc);}
+        if(!err){ 
+            console.log(doc);
+            res.send(doc);
+        }
         else {
             console.log('Task post error:' + JSON.stringify(err, undefined, 2)); 
             res.send(err);

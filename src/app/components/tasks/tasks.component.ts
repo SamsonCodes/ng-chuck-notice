@@ -160,13 +160,19 @@ export class TasksComponent implements OnInit, AfterViewInit {
 
         let observableList = [];
         observableList.push(this.submitAssignments(assignments, task._id));
-        observableList.push(this.submitDependencies(this.taskForm.value.dependencies, task._id));
+        observableList.push(this.submitDependencies(this.taskForm.value.dependencies, task._id));        
         return combineLatest(observableList);
       }),
       defaultIfEmpty()
-    ).subscribe(()=>{        
-      this.refreshTaskList();
-      this.resetForm();
+    ).subscribe((doc)=>{
+      console.log(doc);
+      let taskId = '?';
+      this.taskService.getTask(taskId).subscribe((taskData)=>{
+        let addedTask = taskData as Task;
+        this.taskService.dependencyCheckAndUpdate(addedTask);        
+        this.refreshTaskList();
+        this.resetForm();
+      });      
     });
   }
 
