@@ -6,7 +6,7 @@ import { MatTableDataSource } from '@angular/material/table';
 import { LiveAnnouncer } from '@angular/cdk/a11y';
 
 import { Observable, combineLatest } from 'rxjs';
-import { defaultIfEmpty, tap, switchMap } from 'rxjs/operators';
+import { defaultIfEmpty, switchMap } from 'rxjs/operators';
 
 import { TaskService } from '../../services/task.service';
 import { Task } from '../../classes/task';
@@ -144,10 +144,10 @@ export class TasksComponent implements OnInit, AfterViewInit {
 
   onSubmit(){        
     this.newTask.created_on = this.getCreatedOn();
-    this.taskService.postTask(this.newTask).pipe( 
-      // After the task is added: add the assignments and dependencies to the database using the id from http response.     
-      tap((taskData) => {
-        let task = taskData as Task;        
+    this.taskService.postTask(this.newTask).pipe(
+      //Using a switchMap here to make sure all the database updates are finished before refreshing the task list.      
+      switchMap((taskData) => {
+        let task = taskData as Task;
         
         let assignments: string[] = [];
         if(this.hasManagerRights()){          
@@ -163,25 +163,16 @@ export class TasksComponent implements OnInit, AfterViewInit {
         observableList.push(this.submitDependencies(this.taskForm.value.dependencies, task._id));        
         return combineLatest(observableList);
       }),
-      // After that is completed: Do a dependency check to open the task if it's dependencies are finished.      
-      switchMap((taskData) => {
-        let task = taskData as Task;        
-        let taskId = task._id;
-        let observable = new Observable(subscriber=>{
-          this.taskService.getTask(taskId).subscribe((taskData)=>{
-            let addedTask = taskData as Task;
-            this.taskService.dependencyCheckAndUpdate(addedTask).subscribe(()=>{
-              subscriber.next();
-            }); 
-          });
-        })
-        return observable;
-      }),
       defaultIfEmpty()
-    ).subscribe(() => {
-      // Only after all the above is completed: Refresh the page.
-      this.refreshTaskList();
-      this.resetForm();   
+    ).subscribe((doc)=>{
+      console.log(doc);
+      let taskId = '?';
+      this.taskService.getTask(taskId).subscribe((taskData)=>{
+        let addedTask = taskData as Task;
+        this.taskService.dependencyCheckAndUpdate(addedTask);        
+        this.refreshTaskList();
+        this.resetForm();
+      });      
     });
   }
 
