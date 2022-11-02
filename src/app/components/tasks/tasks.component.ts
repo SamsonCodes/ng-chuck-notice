@@ -144,67 +144,77 @@ export class TasksComponent implements OnInit, AfterViewInit {
 
   onSubmit(){        
     this.newTask.created_on = this.getCreatedOn();
-    this.taskService.postTask(this.newTask).pipe(
-      //Using a switchMap here to make sure all the database updates are finished before refreshing the task list.      
-      switchMap((taskData) => {
-        let task = taskData as Task;
-        
-        let assignments: string[] = [];
-        if(this.hasManagerRights()){          
-          assignments = this.taskForm.value.assignments;
-        }
-        else{
-          let id = this.authService.getUser()!._id;
-          assignments = [id!]; // Only add assignment to current user         
-        }
+    this.taskService.postTask(this.newTask).subscribe((taskData)=>{
+      let task = taskData as Task;        
+      
+      let assignments: string[] = [];
+      if(this.hasManagerRights()){          
+        assignments = this.taskForm.value.assignments;
+      }
+      else{
+        let id = this.authService.getUser()!._id;
+        assignments = [id!]; // Only add assignment to current user         
+      }
 
-        let observableList = [];
-        observableList.push(this.submitAssignments(assignments, task._id));
-        observableList.push(this.submitDependencies(this.taskForm.value.dependencies, task._id));        
-        return combineLatest(observableList);
-      }),
-      defaultIfEmpty()
-    ).subscribe((doc)=>{
-      console.log(doc);
-      let taskId = '?';
-      this.taskService.getTask(taskId).subscribe((taskData)=>{
-        let addedTask = taskData as Task;
-        this.taskService.dependencyCheckAndUpdate(addedTask);        
-        this.refreshTaskList();
-        this.resetForm();
+      let observableList = [];
+      observableList.push(this.submitAssignments(assignments, task._id));
+      observableList.push(this.submitDependencies(this.taskForm.value.dependencies, task._id));        
+      combineLatest(observableList).subscribe(()=>{
+        this.taskService.dependencyCheckAndUpdate(task).subscribe(()=>{
+          this.refreshTaskList();
+          this.resetForm();
+        })  
       });      
     });
   }
 
-  submitAssignments(formAssignmentValues: Array<string>, taskId: string): Observable<Object[]>{  
-    let formAmount = formAssignmentValues.length;
-    let databaseCalls = [];
-    for(let i = 0; i < formAmount; i++){
-      let newAssignment: Assignment = 
-      {
-        _id: '',
-        user_id: formAssignmentValues[i],
-        task_id: taskId
-      };
-      databaseCalls.push(this.assignmentService.postAssignment(newAssignment));
-    }
-    return combineLatest(databaseCalls);
+  submitAssignments(formAssignmentValues: Array<string>, taskId: string): Observable<void>{  
+    let observable = new Observable<void>(subscriber => {
+      let formAmount = formAssignmentValues.length;
+      let databaseCalls = [];
+      for(let i = 0; i < formAmount; i++){
+        let newAssignment: Assignment = 
+        {
+          _id: '',
+          user_id: formAssignmentValues[i],
+          task_id: taskId
+        };
+        databaseCalls.push(this.assignmentService.postAssignment(newAssignment));
+      }
+      if(databaseCalls.length == 0){
+        subscriber.next();
+      }
+      combineLatest(databaseCalls).subscribe((results)=>{
+        subscriber.next();
+        subscriber.complete();
+      })
+    });
+    return observable;    
   }
 
-  submitDependencies(formDependencyValues: Array<string>, taskId: string): Observable<Object[]> {
-    let formAmount = formDependencyValues.length;
+  submitDependencies(formDependencyValues: Array<string>, taskId: string): Observable<void> {
+    let observable = new Observable<void>(subscriber => {
+      let formAmount = formDependencyValues.length;
     
-    let databaseCalls = [];
-    for(let i = 0; i < formAmount; i++){
-      let newDependency: Dependency = 
-      {
-        _id: '',
-        dependency_id: formDependencyValues[i],
-        task_id: taskId
-      };
-      databaseCalls.push(this.dependencyService.postDependency(newDependency));
-    } 
-    return combineLatest(databaseCalls);
+      let databaseCalls = [];
+      for(let i = 0; i < formAmount; i++){
+        let newDependency: Dependency = 
+        {
+          _id: '',
+          dependency_id: formDependencyValues[i],
+          task_id: taskId
+        };
+        databaseCalls.push(this.dependencyService.postDependency(newDependency));
+      }
+      if(databaseCalls.length == 0){
+        subscriber.next();
+      }
+      combineLatest(databaseCalls).subscribe((results)=>{
+        subscriber.next();
+        subscriber.complete();
+      })
+    });
+    return observable;  
   }
 
 
